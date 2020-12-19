@@ -1,3 +1,5 @@
 **/*.sw[nop]
 out/*
 node_modules/*
+manually_created_images/*
+.DS_Store
