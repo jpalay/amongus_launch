@@ -1,5 +1,5 @@
-import * as Scene from "./Scene.js";
-import * as Helpers from "./helpers.js";
+import * as Scene from "./Scene";
+import * as Helpers from "./helpers";
 
 export type PlayerState = {
     position: Helpers.Coordinate;

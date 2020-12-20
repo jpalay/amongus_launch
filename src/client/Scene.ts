@@ -1,5 +1,5 @@
-import * as CurrentPlayer from "./CurrentPlayer.js";
-import * as Helpers from "./helpers.js";
+import * as CurrentPlayer from "./CurrentPlayer";
+import * as Helpers from "./helpers";
 
 export interface WorldObject {
     objectType: "sprite" | "solid";

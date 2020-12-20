@@ -1,23 +1,20 @@
-import * as Scene from './Scene.js'
-import * as CurrentPlayer from './CurrentPlayer.js'
-import * as OctogonalWall from './OctogonalWall.js'
+// These should be at the top of the file
+import Bundler from "parcel-bundler";
+import path from "path";
 
-const   main = () => {
-    const canvas = <HTMLCanvasElement> document.getElementById("myCanvas");
+import express from "express";
 
-    const scene = new Scene.Scene(
-        canvas,
-        new CurrentPlayer.CurrentPlayer(canvas),
-        [],
-        [
-            new OctogonalWall.OctogonalWall(
-                800,
-                { width: canvas.offsetWidth, height: canvas.offsetHeight }
-            )
-        ]
-    );
-    scene.run()
-}
+const app = express();
+const port = 8080 || process.env.PORT;
 
+// replace the call to app.get with:
+const bundler = new Bundler(path.join(__dirname, "../src/client/index.html"));
+app.use(bundler.middleware());
 
-window.onload = main;
+app.use(express.static('../assets'))
+
+app.listen(port, () => {
+  // tslint:disable-next-line:no-console
+  console.log(`server started at http://localhost:${port}`);
+});
+

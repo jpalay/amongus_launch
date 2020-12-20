@@ -1,5 +1,5 @@
-import * as Helpers from "./helpers.js";
-import * as Scene from "./Scene.js"
+import * as Helpers from "./helpers";
+import * as Scene from "./Scene"
 
 export class OctogonalWall implements Scene.SolidObject {
     objectType: "solid";

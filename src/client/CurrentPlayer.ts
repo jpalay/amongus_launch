@@ -1,6 +1,6 @@
-import * as Player from "./Player.js";
-import * as Scene from "./Scene.js";
-import * as Helpers from "./helpers.js";
+import * as Player from "./Player";
+import * as Scene from "./Scene";
+import * as Helpers from "./helpers";
 
 export class CurrentPlayer extends Player.Player {
     maxSpeed: number;
