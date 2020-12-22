@@ -1,4 +1,4 @@
-import * as CurrentPlayer from "./CurrentPlayer";
+import { CurrentPlayer } from "./CurrentPlayer";
 import * as Helpers from "./helpers";
 
 export interface WorldObject {
@@ -31,14 +31,14 @@ export type SceneState = {
 
 export class Scene {
     canvas: HTMLCanvasElement;
-    currentPlayer: CurrentPlayer.CurrentPlayer;
+    currentPlayer: CurrentPlayer;
     sprites: Sprite[];
     solidObjects: SolidObject[];
     state: SceneState;
 
     constructor(
 		canvas: HTMLCanvasElement,
-        currentPlayer: CurrentPlayer.CurrentPlayer,
+        currentPlayer: CurrentPlayer,
         sprites: Sprite[],
         solidObjects: SolidObject[]
     ) {

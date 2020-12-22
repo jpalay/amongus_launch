@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "module": "commonjs",
+    "strict": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "target": "es6",
@@ -20,5 +21,9 @@
   ],
   "exclude": [
     "src/client"
+  ],
+  "references": [
+    { "path": "./src/server" },
+    { "path": "./src/client" }
   ]
 }

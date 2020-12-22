@@ -6,6 +6,7 @@ export type PlayerState = {
     facingLeft: boolean;
 }
 
+
 export class Player implements Scene.Sprite {
     objectType: "sprite";
     image: HTMLImageElement;
@@ -14,7 +15,7 @@ export class Player implements Scene.Sprite {
 
     constructor(canvas: HTMLCanvasElement) {
         this.objectType = "sprite";
-        this.image = <HTMLImageElement>document.getElementById("red0");
+        this.image = (document.getElementById("red0") as HTMLImageElement);
         this.size = { width: 40, height: 50 };
 
         this.state = {

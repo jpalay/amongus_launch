@@ -5,9 +5,11 @@
       "dom"
     ],
     "allowSyntheticDefaultImports": true,
+    "strict": true,
     "jsx": "react",
     "module": "es6",
     "target": "es6",
+    "composite": true,
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "../../dist",

@@ -1,22 +1,32 @@
-import * as Scene from './Scene'
-import * as CurrentPlayer from './CurrentPlayer'
-import * as OctogonalWall from './OctogonalWall'
+// import * as Scene from './Scene'
+// import * as CurrentPlayer from './CurrentPlayer'
+// import * as OctogonalWall from './OctogonalWall'
 
-const   main = () => {
-    const canvas = <HTMLCanvasElement> document.getElementById("myCanvas");
+import React from "react";
+import ReactDOM from "react-dom";
+import * as GameStateManager from './GameStateManager'
 
-    const scene = new Scene.Scene(
-        canvas,
-        new CurrentPlayer.CurrentPlayer(canvas),
-        [],
-        [
-            new OctogonalWall.OctogonalWall(
-                800,
-                { width: canvas.offsetWidth, height: canvas.offsetHeight }
-            )
-        ]
+const main = () => {
+    const gameStateManager = 
+    ReactDOM.render(
+        GameStateManager.create({});
+        <HTMLDivElement>document.getElementById("main")
     );
-    scene.run()
+
+    // const canvas = <HTMLCanvasElement> document.getElementById("myCanvas");
+    //
+    // const scene = new Scene.Scene(
+    //     canvas,
+    //     new CurrentPlayer.CurrentPlayer(canvas),
+    //     [],
+    //     [
+    //         new OctogonalWall.OctogonalWall(
+    //             800,
+    //             { width: canvas.offsetWidth, height: canvas.offsetHeight }
+    //         )
+    //     ]
+    // );
+    // scene.run()
 }
 
 
