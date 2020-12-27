@@ -45,7 +45,7 @@ export class CurrentPlayer extends Player.Player {
         }
 
         // check for collisions
-        if (!this._hasCollision(nextState, scene.solidObjects)) {
+        if (!this._hasCollision(nextState, scene.staticObjects)) {
             this._setState(nextState);
         } else {
             // try just moving horizontally
@@ -57,7 +57,7 @@ export class CurrentPlayer extends Player.Player {
                 }
             };
 
-            if (!this._hasCollision(horizontalNextState, scene.solidObjects)) {
+            if (!this._hasCollision(horizontalNextState, scene.staticObjects)) {
                 this._setState(horizontalNextState);
             } else {
                 // try just moving vertically
@@ -69,7 +69,7 @@ export class CurrentPlayer extends Player.Player {
                     }
                 };
 
-                if (!this._hasCollision(verticalNextState, scene.solidObjects)) {
+                if (!this._hasCollision(verticalNextState, scene.staticObjects)) {
                     this._setState(verticalNextState);
                 } else {
                     this._setState({
@@ -105,10 +105,10 @@ export class CurrentPlayer extends Player.Player {
         }
     }
 
-    private _hasCollision(state: Player.PlayerState, solidObjects: Scene.SolidObject[]) {
-        return solidObjects.some(solidObject => {
+    private _hasCollision(state: Player.PlayerState, staticObjects: Scene.StaticObject[]) {
+        return staticObjects.some(staticObject => {
             return this._getCorners(state).some(corner => {
-                return solidObject.blocksPoint(corner);
+                return staticObject.blocksPoint(corner);
             })
         });
     }

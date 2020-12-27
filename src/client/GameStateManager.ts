@@ -36,7 +36,7 @@ export class GameStateManager {
         this.socket = props.socket;
         this.scene = new Scene.Scene({
             socket: props.socket,
-            solidObjects: [
+            staticObjects: [
                 new OctogonalWall.OctogonalWall(
                     800,
                     { width: 900, height: 900 }

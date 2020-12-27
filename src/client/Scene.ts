@@ -9,7 +9,7 @@ export interface WorldObject {
     render(canvas: HTMLCanvasElement): void;
 }
 
-export interface SolidObject extends WorldObject {
+export interface StaticObject extends WorldObject {
     objectType: "solid"
     blocksPoint: (testPoint: Helpers.Coordinate) => boolean;
 }
@@ -34,7 +34,7 @@ export type SceneState = {
 
 export class Scene {
     socket: SocketIOClient.Socket;
-    solidObjects: SolidObject[];
+    staticObjects: StaticObject[];
     players: Player.Player[];
     state: SceneState;
     currentPlayerName: string | null;
@@ -42,16 +42,16 @@ export class Scene {
 
     constructor({
         socket,
-        solidObjects,
+        staticObjects,
         addPlayerCallback
     }: {
         socket: SocketIOClient.Socket,
-        solidObjects: SolidObject[],
+        staticObjects: StaticObject[],
         addPlayerCallback: () => void
     }) {
         this.socket = socket;
         this.players = [];
-        this.solidObjects = solidObjects;
+        this.staticObjects = staticObjects;
         this.currentPlayerName = null;
         this.addPlayerCallback  = addPlayerCallback;
         this.state = {
@@ -109,8 +109,8 @@ export class Scene {
         const context = Helpers.getContext(canvas);
 
         context.clearRect(0, 0, canvas.width, canvas.height);
-        this.solidObjects.forEach(solidObject => {
-            solidObject.render(canvas);
+        this.staticObjects.forEach(staticObject => {
+            staticObject.render(canvas);
         })
         this.players.forEach(player => {
             player.render(canvas);

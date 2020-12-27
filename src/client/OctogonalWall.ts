@@ -1,7 +1,7 @@
 import * as Helpers from "./helpers";
 import * as Scene from "./Scene"
 
-export class OctogonalWall implements Scene.SolidObject {
+export class OctogonalWall implements Scene.StaticObject {
     objectType: "solid";
     octogonSize: number;
     offset: { offsetX: number, offsetY: number };
@@ -15,7 +15,18 @@ export class OctogonalWall implements Scene.SolidObject {
         }
     }
 
-    coordinates() {
+    render(canvas: HTMLCanvasElement) {
+        this._renderWithContext(Helpers.getContext(canvas));
+    };
+
+    blocksPoint(testPoint: Helpers.Coordinate) {
+        const testCanvas = document.createElement('canvas');
+        const context = Helpers.getContext(testCanvas);
+        this._renderWithContext(context);
+        return context.isPointInStroke(testPoint.x, testPoint.y);
+    }
+    
+    private _coordinates() {
         const sideLength = Math.sqrt(2) * this.octogonSize / (Math.sqrt(2) + 2);
         const cornerLength = sideLength / Math.sqrt(2);
 
@@ -62,15 +73,8 @@ export class OctogonalWall implements Scene.SolidObject {
         return coordinates;
     }
 
-    blocksPoint(testPoint: Helpers.Coordinate) {
-        const testCanvas = document.createElement('canvas');
-        const context = Helpers.getContext(testCanvas);
-        this._renderWithContext(context);
-        return context.isPointInStroke(testPoint.x, testPoint.y);
-    }
-    
-    _renderWithContext(context: CanvasRenderingContext2D) {
-        const coordinates = this.coordinates();
+    private _renderWithContext(context: CanvasRenderingContext2D) {
+        const coordinates = this._coordinates();
         context.beginPath();
         context.moveTo(coordinates[0].x, coordinates[0].y);
         for (var i = 1; i < coordinates.length; i++) {
@@ -82,8 +86,4 @@ export class OctogonalWall implements Scene.SolidObject {
         context.strokeStyle = 'blue';
         context.stroke();
     }
-
-    render(canvas: HTMLCanvasElement) {
-        this._renderWithContext(Helpers.getContext(canvas));
-    };
 }
