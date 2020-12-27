@@ -60,7 +60,6 @@ export class GameStateManager {
         });
     }
 
-
     /****************************
      *  RENDERING
      ***************************/
@@ -104,7 +103,7 @@ export class GameStateManager {
     }
 
     private _renderLobby() {
-        const startGameButton = this._currentPlayer().isAdmin
+        const startGameButton = this.scene.currentPlayer()?.isAdmin
             ? m("button", { onclick: () => this._startGame() }, "start game")
             : null;
 
@@ -121,11 +120,18 @@ export class GameStateManager {
         });
     }
 
+    onupdate() {
+        const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById("GameCanvas");
+        if (canvas != null && this.gameLoopInterval === null) {
+            this.gameLoopInterval = this.scene.run(canvas);
+        }
+    }
+
     /****************************
      * EVENT HANDLERS
      ***************************/
 
-    _registerUser() {
+    private _registerUser() {
         const userName = this.state.userName;
         const roomName = this.state.roomName;
         this.scene.currentPlayerName = userName;
@@ -173,17 +179,6 @@ export class GameStateManager {
         
         if (this.state.gamePhase === "lobby") {
             m.redraw();
-        }
-    }
-
-    private _currentPlayer() {
-        return this.scene.players.filter(player => player.name === this.state.userName)[0];
-    }
-
-    onupdate() {
-        const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById("GameCanvas");
-        if (canvas != null && this.gameLoopInterval === null) {
-            this.gameLoopInterval = this.scene.run(canvas);
         }
     }
 }

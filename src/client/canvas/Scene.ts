@@ -20,7 +20,7 @@ export interface Sprite extends WorldObject {
     render(canvas: HTMLCanvasElement): void;
 }
 
-export type SceneState = {
+export type State = {
     ticks: number;
     keyboard: {
         space: boolean;
@@ -36,7 +36,7 @@ export class Scene {
     socket: SocketIOClient.Socket;
     staticObjects: StaticObject[];
     players: Player.Player[];
-    state: SceneState;
+    state: State;
     currentPlayerName: string | null;
     addPlayerCallback: () => void;
 
@@ -89,9 +89,10 @@ export class Scene {
         this.players = this.players.concat(newPlayers);
 
         // move the current player to the back, so it's always rendered last and on top
-        const currentPlayerIndex = this.players.findIndex(player =>
-            this.currentPlayerName !== null && player.name === this.currentPlayerName
-        );
+        const currentPlayer = this.currentPlayer();
+        const currentPlayerIndex = currentPlayer !== null
+            ? this.players.indexOf(currentPlayer)
+            : -1;
 
         if (currentPlayerIndex !== -1) {
             this.players.push(
@@ -120,6 +121,11 @@ export class Scene {
     private _updateState() {
         this.state.ticks += 1;
         this.players.forEach(player => { player.updateState(this) });
+    }
+
+    currentPlayer() {
+        const currentPlayer = this.players.filter(player => player.name === this.currentPlayerName)[0];
+        return currentPlayer ? currentPlayer : null;
     }
 
     run(canvas: HTMLCanvasElement) {

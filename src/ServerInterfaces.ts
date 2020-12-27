@@ -4,7 +4,6 @@ export const Colors = ["teal", "red", "blue", "purple", "brown", "black", "pink"
 export type Color = (typeof Colors)[number];
 export type GamePhase ="lobby" | "run_game";
 export type Room = { name: string, gamePhase: GamePhase};
-export type PlayerState = Player.PlayerState;
 
 
 export type PlayerDescriptor = {
@@ -13,7 +12,7 @@ export type PlayerDescriptor = {
     name: string;
     isAdmin: boolean;
     color: Color;
-    initialState: PlayerState
+    initialState: Player.State
 }
 
 export type RegisterUserParams = {
@@ -43,7 +42,7 @@ export type StartGameResponse = {
 export type UpdateStateParams = {
     eventName: "update_state";
     playerId: string;
-    updateQueue: Player.PlayerState[],
+    updateQueue: Player.State[],
 };
 
 export type UpdateStateResponse = UpdateStateParams;

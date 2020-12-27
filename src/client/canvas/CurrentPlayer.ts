@@ -5,7 +5,7 @@ import * as ServerInterfaces from "../../ServerInterfaces";
 
 export class CurrentPlayer extends Player.Player {
     maxSpeed: number;
-    updateQueue: Player.PlayerState[];
+    updateQueue: Player.State[];
 
     constructor(socket: SocketIOClient.Socket, player: ServerInterfaces.PlayerDescriptor) {
         super(socket, player);
@@ -24,7 +24,7 @@ export class CurrentPlayer extends Player.Player {
         const mouseVectorMagnitude = Math.sqrt(mouseVector.x ** 2 + mouseVector.y ** 2);
 
         // calculate next state
-        const nextState: Player.PlayerState = {
+        const nextState: Player.State = {
             position: { ...this.state.position },
             facingLeft: this.state.facingLeft,
             walkingTicks: this.state.walkingTicks + 1
@@ -80,7 +80,7 @@ export class CurrentPlayer extends Player.Player {
         }
     }
 
-    private _setState(nextState: Player.PlayerState) {
+    private _setState(nextState: Player.State) {
         if (
             this.state.position.x !== nextState.position.x
             || this.state.position.y !== nextState.position.y
@@ -104,7 +104,7 @@ export class CurrentPlayer extends Player.Player {
         }
     }
 
-    private _hasCollision(state: Player.PlayerState, staticObjects: Scene.StaticObject[]) {
+    private _hasCollision(state: Player.State, staticObjects: Scene.StaticObject[]) {
         return staticObjects.some(staticObject => {
             return this._getCorners(state).some(corner => {
                 return staticObject.blocksPoint(corner);
@@ -112,7 +112,7 @@ export class CurrentPlayer extends Player.Player {
         });
     }
 
-    private _getCorners(state: Player.PlayerState): Helpers.Coordinate[] {
+    private _getCorners(state: Player.State): Helpers.Coordinate[] {
         return [
             {x: state.position.x, y: state.position.y },
             {x: state.position.x + this.size.width, y: state.position.y },

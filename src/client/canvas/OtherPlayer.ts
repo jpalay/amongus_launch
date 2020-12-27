@@ -4,7 +4,7 @@ import * as Helpers from "./helpers";
 import * as ServerInterfaces from "../../ServerInterfaces";
 
 export class OtherPlayer extends Player.Player {
-    private updateQueue: Player.PlayerState[];
+    private updateQueue: Player.State[];
 
     constructor(socket: SocketIOClient.Socket, player: ServerInterfaces.PlayerDescriptor) {
         super(socket, player);
