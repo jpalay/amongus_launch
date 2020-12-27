@@ -5,11 +5,18 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import * as GameStateManager from './GameStateManager'
+import io from "socket.io-client";
 
 const main = () => {
+    const socket: SocketIOClient.Socket = io(
+        `ws://${document.location.hostname}:3000`,
+        {
+            transports: ['websocket']
+        }
+    );
     const gameStateManager = 
     ReactDOM.render(
-        GameStateManager.create({});
+        GameStateManager.create({ socket }),
         <HTMLDivElement>document.getElementById("main")
     );
 

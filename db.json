@@ -1,1 +1,89 @@
-{}
+{
+  "players": [
+    {
+      "roomName": "x",
+      "name": "a",
+      "isAdmin": true,
+      "id": "2b25d9c2-9c9d-4933-b5f5-6ba5269e890f",
+      "color": "red",
+      "initialState": {
+        "position": {
+          "x": 400,
+          "y": 400
+        },
+        "facingLeft": false,
+        "walkingTicks": 0
+      }
+    },
+    {
+      "roomName": "x",
+      "name": "b",
+      "isAdmin": false,
+      "id": "282fceac-f5e1-4fa8-a02f-2cc4eff840d6",
+      "color": "red",
+      "initialState": {
+        "position": {
+          "x": 400,
+          "y": 400
+        },
+        "facingLeft": false,
+        "walkingTicks": 0
+      }
+    },
+    {
+      "roomName": "x",
+      "name": "player 1",
+      "isAdmin": false,
+      "id": "58bfac23-5e5c-4ada-ac0a-4655d3bef3fc",
+      "color": "red",
+      "initialState": {
+        "position": {
+          "x": 400,
+          "y": 400
+        },
+        "facingLeft": false,
+        "walkingTicks": 0
+      }
+    },
+    {
+      "roomName": "yay",
+      "name": "yoshote",
+      "isAdmin": true,
+      "id": "9ad660ab-c479-40ef-a849-d20b055b8d47",
+      "color": "red",
+      "initialState": {
+        "position": {
+          "x": 400,
+          "y": 400
+        },
+        "facingLeft": false,
+        "walkingTicks": 0
+      }
+    },
+    {
+      "roomName": "yay",
+      "name": "jenny",
+      "isAdmin": false,
+      "id": "22745ebf-5da6-4be0-9ad6-41c4ca86301a",
+      "color": "red",
+      "initialState": {
+        "position": {
+          "x": 400,
+          "y": 400
+        },
+        "facingLeft": false,
+        "walkingTicks": 0
+      }
+    }
+  ],
+  "rooms": [
+    {
+      "name": "x",
+      "gamePhase": "run_game"
+    },
+    {
+      "name": "yay",
+      "gamePhase": "run_game"
+    }
+  ]
+}

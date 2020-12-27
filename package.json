@@ -5,17 +5,29 @@
   "main": "dist/index.js",
   "scripts": {
     "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
-    "build": "tsc",
+    "build": "tsc -b . ./src/client",
     "prestart": "npm run build",
     "start": "node .",
-    "dev": "ts-node-dev src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "ts-node-dev src/index.ts --host 0.0.0.0",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "npm-watch"
+  },
+  "watch": {
+    "build": {
+      "patterns": [
+        "src",
+        "src/client"
+      ],
+      "extensions": "ts,tsx"
+    }
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@types/lowdb": "^1.0.9",
+    "@types/react-dom": "^17.0.0",
+    "@types/socket.io-client": "^1.4.34",
     "express": "^4.17.1",
     "immutable": "^4.0.0-rc.12",
     "lowdb": "^1.0.0",
@@ -24,7 +36,8 @@
     "react-dom": "^16.13.1",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
-    "uuid": "^8.1.0"
+    "uuid": "^8.1.0",
+    "watch": "^1.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.10.2",

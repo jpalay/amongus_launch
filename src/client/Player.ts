@@ -1,30 +1,42 @@
 import * as Scene from "./Scene";
 import * as Helpers from "./helpers";
+import { PlayerDescriptor } from "../ServerInterfaces";
 
 export type PlayerState = {
     position: Helpers.Coordinate;
     facingLeft: boolean;
+    walkingTicks: number;
 }
 
 
 export class Player implements Scene.Sprite {
     objectType: "sprite";
-    image: HTMLImageElement;
+    socket: SocketIOClient.Socket;
+    name: string;
+    id: string;
     size: Helpers.Dimensions;
     state: PlayerState;
 
-    constructor(canvas: HTMLCanvasElement) {
-        this.objectType = "sprite";
-        this.image = (document.getElementById("red0") as HTMLImageElement);
-        this.size = { width: 40, height: 50 };
+    constructor(canvas: HTMLCanvasElement, socket: SocketIOClient.Socket, player: PlayerDescriptor) {
+        this.name = player.name;
+        this.socket = socket;
+        this.id = player.id;
+        this.state = player.initialState;
 
-        this.state = {
-            position: {
-                x: canvas.offsetWidth / 2 - this.size.width / 2,
-                y: canvas.offsetHeight / 2 - this.size.height / 2
-            },
-            facingLeft: false
-        };
+        this.objectType = "sprite";
+        this.size = { width: 40, height: 50 };
+    }
+
+    private _getImage() {
+        const imageNumber = Math.floor(this.state.walkingTicks / 5) % 4;
+        return (document.getElementById(`red${imageNumber}`) as HTMLImageElement);
+    }
+
+    _center(): Helpers.Coordinate {
+        return {
+            x: this.state.position.x + this.size.width / 2,
+            y: this.state.position.y + this.size.height / 2
+        }
     }
 
     render(canvas: HTMLCanvasElement) {
@@ -39,7 +51,7 @@ export class Player implements Scene.Sprite {
         }
 
         context.drawImage(
-            this.image,
+            this._getImage(),
             this.state.facingLeft
                 ? canvasWidth - this.state.position.x - this.size.width
                 : this.state.position.x,
@@ -49,6 +61,15 @@ export class Player implements Scene.Sprite {
         );
 
         context.restore();
+
+        context.save();
+        context.font = '10px sans-serif';
+        context.textAlign = 'center';
+        const center = this._center();
+        const textX = center.x;
+        const textY = center.y + this.size.height / 2 + 12;
+        context.fillText(this.name, textX, textY, 90);
+        context.restore()
     }
 
     updateState(scene: Scene.Scene) {

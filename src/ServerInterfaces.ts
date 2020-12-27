@@ -3,6 +3,19 @@ import * as Helpers from "./client/helpers";
 
 export const Colors = ["teal", "red", "blue", "purple", "brown", "black", "pink"] as const;
 export type Color = (typeof Colors)[number];
+export type GamePhase ="lobby" | "run_game";
+export type Room = { name: string, gamePhase: GamePhase};
+export type PlayerState = Player.PlayerState;
+
+
+export type PlayerDescriptor = {
+    roomName: string;
+    id: string;
+    name: string;
+    isAdmin: boolean;
+    color: Color;
+    initialState: PlayerState
+}
 
 export type RegisterUserParams = {
     eventName: "register_user";
@@ -13,9 +26,9 @@ export type RegisterUserParams = {
 
 export type RegisterUserResponse = {
     eventName: "register_user";
-    id: number;
-    isAdmin: boolean;
-    players: PlayerDescriptor[];
+    registeredPlayer: PlayerDescriptor;
+    allPlayers: PlayerDescriptor[];
+    gamePhase: GamePhase;
 }
 
 export type StartGameParams = {
@@ -23,25 +36,18 @@ export type StartGameParams = {
     roomName: string;
 }
 
-export type PlayerDescriptor = {
-    name: string;
-    id: number;
-    color: Color;
-}
-
 export type StartGameResponse = {
     eventName: "start_game";
-    players: PlayerDescriptor[];
-    playerStates: Player.PlayerState;
+    allPlayers: PlayerDescriptor[];
 }
 
 export type UpdateStateParams = {
     eventName: "update_state";
-    playerId: number;
-    state: Player.PlayerState,
+    playerId: string;
+    updateQueue: Player.PlayerState[],
 };
 
 export type UpdateStateResponse = UpdateStateParams;
 
-export type Params = RegisterUserParams | StartGameParams | UpdateStateParams;
-export type Response = RegisterUserResponse | StartGameResponse | UpdateStateResponse;
+export type RequestParams = RegisterUserParams | StartGameParams | UpdateStateParams;
+export type ServerResponse = RegisterUserResponse | StartGameResponse | UpdateStateResponse;

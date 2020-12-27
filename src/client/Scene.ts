@@ -1,5 +1,7 @@
 import { CurrentPlayer } from "./CurrentPlayer";
 import * as Helpers from "./helpers";
+import * as OtherPlayer from "./OtherPlayer";
+import * as ServerInterfaces from "../ServerInterfaces";
 
 export interface WorldObject {
     objectType: "sprite" | "solid";
@@ -31,18 +33,21 @@ export type SceneState = {
 
 export class Scene {
     canvas: HTMLCanvasElement;
+    socket: SocketIOClient.Socket;
     currentPlayer: CurrentPlayer;
-    sprites: Sprite[];
+    sprites: OtherPlayer.OtherPlayer[];
     solidObjects: SolidObject[];
     state: SceneState;
 
     constructor(
 		canvas: HTMLCanvasElement,
+        socket: SocketIOClient.Socket,
         currentPlayer: CurrentPlayer,
-        sprites: Sprite[],
+        sprites: OtherPlayer.OtherPlayer[],
         solidObjects: SolidObject[]
     ) {
         this.canvas = canvas;
+        this.socket = socket;
         this.currentPlayer = currentPlayer;
         this.sprites = sprites;
         this.solidObjects = solidObjects;
@@ -57,6 +62,14 @@ export class Scene {
                 pressed: false
             }
         };
+
+        this.socket.on("event", (message: ServerInterfaces.ServerResponse) => {
+            if (message.eventName === "register_user") {
+                if (this.sprites.filter(s => s.id === message.registeredPlayer.id).length === 0) {
+                    this.sprites.push(new OtherPlayer.OtherPlayer(this.canvas, this.socket, message.registeredPlayer));
+                }
+            }
+        });
     }
 
     private _renderScene() {
@@ -111,7 +124,7 @@ export class Scene {
                 this._updateState();
                 this._renderScene();
             },
-            10
+            33
         )
     }
 }
