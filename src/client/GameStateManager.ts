@@ -1,7 +1,8 @@
-import * as ServerInterfaces from "../ServerInterfaces";
-import * as OctogonalWall from "./OctogonalWall"
 import m from "mithril";
-import * as Scene from "./Scene"
+
+import * as ServerInterfaces from "../ServerInterfaces";
+import * as Scene from "./canvas/Scene"
+import * as OctogonalWall from "./canvas/OctogonalWall"
 
 export type State = {
     gamePhase: "join_game" | "join_game_pending" | "lobby" | "run_game";

@@ -1,13 +1,12 @@
 import * as Player from "./Player";
 import * as Scene from "./Scene";
 import * as Helpers from "./helpers";
-import { PlayerDescriptor } from "../ServerInterfaces";
-import * as ServerInterfaces from "../ServerInterfaces";
+import * as ServerInterfaces from "../../ServerInterfaces";
 
 export class OtherPlayer extends Player.Player {
     private updateQueue: Player.PlayerState[];
 
-    constructor(socket: SocketIOClient.Socket, player: PlayerDescriptor) {
+    constructor(socket: SocketIOClient.Socket, player: ServerInterfaces.PlayerDescriptor) {
         super(socket, player);
         this.updateQueue = [];
 

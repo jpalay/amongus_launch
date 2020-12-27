@@ -1,6 +1,6 @@
 import * as Scene from "./Scene";
 import * as Helpers from "./helpers";
-import { PlayerDescriptor } from "../ServerInterfaces";
+import * as ServerInterfaces from "../../ServerInterfaces";
 
 export type PlayerState = {
     position: Helpers.Coordinate;
@@ -18,7 +18,7 @@ export class Player implements Scene.Sprite {
     size: Helpers.Dimensions;
     state: PlayerState;
 
-    constructor(socket: SocketIOClient.Socket, player: PlayerDescriptor) {
+    constructor(socket: SocketIOClient.Socket, player: ServerInterfaces.PlayerDescriptor) {
         this.name = player.name;
         this.socket = socket;
         this.id = player.id;

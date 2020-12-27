@@ -2,7 +2,7 @@ import * as Helpers from "./helpers";
 import * as Player from "./Player";
 import * as OtherPlayer from "./OtherPlayer";
 import * as CurrentPlayer from "./CurrentPlayer";
-import * as ServerInterfaces from "../ServerInterfaces";
+import * as ServerInterfaces from "../../ServerInterfaces";
 
 export interface WorldObject {
     objectType: "sprite" | "solid";

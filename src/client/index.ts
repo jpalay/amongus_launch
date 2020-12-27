@@ -1,12 +1,7 @@
-// import * as Scene from './Scene'
-// import * as CurrentPlayer from './CurrentPlayer'
-// import * as OctogonalWall from './OctogonalWall'
-
-// import React from "react";
-// import ReactDOM from "react-dom";
-import * as GameStateManager from './GameStateManager'
 import io from "socket.io-client";
 import m from "mithril";
+
+import * as GameStateManager from './GameStateManager'
 
 const main = () => {
     const socket: SocketIOClient.Socket = io(
@@ -15,7 +10,6 @@ const main = () => {
             transports: ['websocket']
         }
     );
-    console.log(<HTMLDivElement>document.getElementById("main"))
     m.mount(
         <HTMLDivElement>document.getElementById("main"),
         new GameStateManager.GameStateManager({ socket })

@@ -1,5 +1,4 @@
-import * as Player from "./client/Player";
-import * as Helpers from "./client/helpers";
+import * as Player from "./client/canvas/Player";
 
 export const Colors = ["teal", "red", "blue", "purple", "brown", "black", "pink"] as const;
 export type Color = (typeof Colors)[number];
