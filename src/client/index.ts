@@ -2,10 +2,11 @@
 // import * as CurrentPlayer from './CurrentPlayer'
 // import * as OctogonalWall from './OctogonalWall'
 
-import React from "react";
-import ReactDOM from "react-dom";
+// import React from "react";
+// import ReactDOM from "react-dom";
 import * as GameStateManager from './GameStateManager'
 import io from "socket.io-client";
+import m from "mithril";
 
 const main = () => {
     const socket: SocketIOClient.Socket = io(
@@ -14,11 +15,12 @@ const main = () => {
             transports: ['websocket']
         }
     );
-    const gameStateManager = 
-    ReactDOM.render(
-        GameStateManager.create({ socket }),
-        <HTMLDivElement>document.getElementById("main")
-    );
+    m.mount(document.body, new GameStateManager.GameStateManager({ socket }));
+    // const gameStateManager = 
+    // ReactDOM.render(
+    //     GameStateManager.create({ socket }),
+    //     <HTMLDivElement>document.getElementById("main")
+    // );
 
     // const canvas = <HTMLCanvasElement> document.getElementById("myCanvas");
     //

@@ -74,6 +74,51 @@
         "facingLeft": false,
         "walkingTicks": 0
       }
+    },
+    {
+      "roomName": "ee",
+      "name": "e",
+      "isAdmin": true,
+      "id": "8d02c31e-5dbd-4ff9-b651-895008b68d32",
+      "color": "red",
+      "initialState": {
+        "position": {
+          "x": 400,
+          "y": 400
+        },
+        "facingLeft": false,
+        "walkingTicks": 0
+      }
+    },
+    {
+      "roomName": "eee",
+      "name": "e",
+      "isAdmin": true,
+      "id": "843bec68-8d33-4570-a6f2-caa72948c27c",
+      "color": "red",
+      "initialState": {
+        "position": {
+          "x": 400,
+          "y": 400
+        },
+        "facingLeft": false,
+        "walkingTicks": 0
+      }
+    },
+    {
+      "roomName": "e",
+      "name": "e",
+      "isAdmin": true,
+      "id": "af746faa-a87b-498a-b36e-bf2c8d408178",
+      "color": "red",
+      "initialState": {
+        "position": {
+          "x": 400,
+          "y": 400
+        },
+        "facingLeft": false,
+        "walkingTicks": 0
+      }
     }
   ],
   "rooms": [
@@ -84,6 +129,18 @@
     {
       "name": "yay",
       "gamePhase": "run_game"
+    },
+    {
+      "name": "ee",
+      "gamePhase": "lobby"
+    },
+    {
+      "name": "eee",
+      "gamePhase": "lobby"
+    },
+    {
+      "name": "e",
+      "gamePhase": "lobby"
     }
   ]
 }

@@ -8,8 +8,8 @@ export class CurrentPlayer extends Player.Player {
     maxSpeed: number;
     updateQueue: Player.PlayerState[];
 
-    constructor(canvas: HTMLCanvasElement, socket: SocketIOClient.Socket, player: PlayerDescriptor) {
-        super(canvas, socket, player);
+    constructor(socket: SocketIOClient.Socket, player: PlayerDescriptor) {
+        super(socket, player);
         this.maxSpeed = 5;
         this.updateQueue = [];
 

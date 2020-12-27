@@ -7,8 +7,8 @@ import * as ServerInterfaces from "../ServerInterfaces";
 export class OtherPlayer extends Player.Player {
     private updateQueue: Player.PlayerState[];
 
-    constructor(canvas: HTMLCanvasElement, socket: SocketIOClient.Socket, player: PlayerDescriptor) {
-        super(canvas, socket, player);
+    constructor(socket: SocketIOClient.Socket, player: PlayerDescriptor) {
+        super(socket, player);
         this.updateQueue = [];
 
         this.socket.on("event", (message: ServerInterfaces.ServerResponse) => {
@@ -25,6 +25,7 @@ export class OtherPlayer extends Player.Player {
             this.updateQueue = this.updateQueue.concat(message.updateQueue);
         }
     }
+
     updateState(scene: Scene.Scene) {
         const nextState = this.updateQueue.shift();
         if (nextState !== undefined) {

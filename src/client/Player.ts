@@ -14,14 +14,16 @@ export class Player implements Scene.Sprite {
     socket: SocketIOClient.Socket;
     name: string;
     id: string;
+    isAdmin: boolean;
     size: Helpers.Dimensions;
     state: PlayerState;
 
-    constructor(canvas: HTMLCanvasElement, socket: SocketIOClient.Socket, player: PlayerDescriptor) {
+    constructor(socket: SocketIOClient.Socket, player: PlayerDescriptor) {
         this.name = player.name;
         this.socket = socket;
         this.id = player.id;
         this.state = player.initialState;
+        this.isAdmin = player.isAdmin;
 
         this.objectType = "sprite";
         this.size = { width: 40, height: 50 };
