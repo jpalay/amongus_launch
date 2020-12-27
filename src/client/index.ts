@@ -15,28 +15,11 @@ const main = () => {
             transports: ['websocket']
         }
     );
-    m.mount(document.body, new GameStateManager.GameStateManager({ socket }));
-    // const gameStateManager = 
-    // ReactDOM.render(
-    //     GameStateManager.create({ socket }),
-    //     <HTMLDivElement>document.getElementById("main")
-    // );
-
-    // const canvas = <HTMLCanvasElement> document.getElementById("myCanvas");
-    //
-    // const scene = new Scene.Scene(
-    //     canvas,
-    //     new CurrentPlayer.CurrentPlayer(canvas),
-    //     [],
-    //     [
-    //         new OctogonalWall.OctogonalWall(
-    //             800,
-    //             { width: canvas.offsetWidth, height: canvas.offsetHeight }
-    //         )
-    //     ]
-    // );
-    // scene.run()
+    console.log(<HTMLDivElement>document.getElementById("main"))
+    m.mount(
+        <HTMLDivElement>document.getElementById("main"),
+        new GameStateManager.GameStateManager({ socket })
+    );
 }
-
 
 window.onload = main;

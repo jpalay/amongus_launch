@@ -1,4 +1,6 @@
 **/*.sw[nop]
+package-lock.json
+db.json
 dist/*
 node_modules/*
 .DS_Store

@@ -68,7 +68,6 @@ export class Scene {
 
         this.socket.on("event", (message: ServerInterfaces.ServerResponse) => {
             if (message.eventName === "register_user") {
-                console.log("user registered", message)
                 this._addNewPlayers(message);
             }
         });
