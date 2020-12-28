@@ -1,18 +1,17 @@
-import * as Player from "./Player";
-import * as Scene from "./Scene";
-import * as Helpers from "./helpers";
-import * as ServerInterfaces from "../../ServerInterfaces";
+import * as Player from './Player';
+import * as Scene from './Scene';
+import * as ServerInterfaces from '../../ServerInterfaces';
 
 export class OtherPlayer extends Player.Player {
     private updateQueue: Player.State[];
 
-    constructor(socket: SocketIOClient.Socket, player: ServerInterfaces.PlayerDescriptor) {
-        super(socket, player);
+    constructor(socket: SocketIOClient.Socket, descriptor: ServerInterfaces.PlayerDescriptor, zIndex: number) {
+        super(socket, descriptor, zIndex);
         this.updateQueue = [];
 
-        this.socket.on("event", (message: ServerInterfaces.ServerResponse) => {
+        this.socket.on('event', (message: ServerInterfaces.ServerResponse) => {
             switch (message.eventName) {
-                case "update_state":
+                case 'update_state':
                     this._updateStateFromServer(message)
                     break;
             }
@@ -20,7 +19,7 @@ export class OtherPlayer extends Player.Player {
     }
 
     private _updateStateFromServer(message: ServerInterfaces.UpdateStateResponse) {
-        if (this.id === message.playerId) {
+        if (this.descriptor.id === message.playerId) {
             this.updateQueue = this.updateQueue.concat(message.updateQueue);
         }
     }

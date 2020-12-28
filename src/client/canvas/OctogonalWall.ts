@@ -1,17 +1,16 @@
-import * as Helpers from "./helpers";
-import * as Scene from "./Scene"
+import * as Helpers from './helpers';
+import * as Scene from './Scene'
 
 export class OctogonalWall implements Scene.StaticObject {
-    objectType: "solid";
-    octogonSize: number;
+    objectType = 'static' as const;
+    octogonWidth: number;
     offset: { offsetX: number, offsetY: number };
 
-    constructor(octogonSize: number, canvasSize: Helpers.Dimensions) {
-        this.objectType = "solid";
-        this.octogonSize = octogonSize
+    constructor(octogonWidth: number, canvasSize: Helpers.Dimensions) {
+        this.octogonWidth = octogonWidth;
         this.offset = {
-            offsetX: (canvasSize.width - octogonSize) / 2,
-            offsetY: (canvasSize.height - octogonSize) / 2,
+            offsetX: (canvasSize.width - octogonWidth) / 2,
+            offsetY: (canvasSize.height - octogonWidth) / 2,
         }
     }
 
@@ -27,7 +26,7 @@ export class OctogonalWall implements Scene.StaticObject {
     }
     
     private _coordinates() {
-        const sideLength = Math.sqrt(2) * this.octogonSize / (Math.sqrt(2) + 2);
+        const sideLength = Math.sqrt(2) * this.octogonWidth / (Math.sqrt(2) + 2);
         const cornerLength = sideLength / Math.sqrt(2);
 
         const last = <T>(elts: T[]): T => elts.slice(-1)[0];

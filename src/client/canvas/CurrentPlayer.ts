@@ -1,14 +1,14 @@
-import * as Player from "./Player";
-import * as Scene from "./Scene";
-import * as Helpers from "./helpers";
-import * as ServerInterfaces from "../../ServerInterfaces";
+import * as Player from './Player';
+import * as Scene from './Scene';
+import * as Helpers from './helpers';
+import * as ServerInterfaces from '../../ServerInterfaces';
 
 export class CurrentPlayer extends Player.Player {
     maxSpeed: number;
     updateQueue: Player.State[];
 
-    constructor(socket: SocketIOClient.Socket, player: ServerInterfaces.PlayerDescriptor) {
-        super(socket, player);
+    constructor(socket: SocketIOClient.Socket, descriptor: ServerInterfaces.PlayerDescriptor, zIndex: number) {
+        super(socket, descriptor, zIndex);
         this.maxSpeed = 5;
         this.updateQueue = [];
 
@@ -17,8 +17,8 @@ export class CurrentPlayer extends Player.Player {
 
     updateState(scene: Scene.Scene) {
         const mouseVector = {
-            x: scene.state.mouse.x - this._center().x,
-            y: scene.state.mouse.y - this._center().y
+            x: scene.state.mouse.x - this.center().x,
+            y: scene.state.mouse.y - this.center().y
         }
 
         const mouseVectorMagnitude = Math.sqrt(mouseVector.x ** 2 + mouseVector.y ** 2);
@@ -95,29 +95,20 @@ export class CurrentPlayer extends Player.Player {
     private _sendUpdateQueue = () => {
         if (this.updateQueue.length > 0) {
             const message: ServerInterfaces.UpdateStateParams = {
-                eventName: "update_state",
-                playerId: this.id,
+                eventName: 'update_state',
+                playerId: this.descriptor.id,
                 updateQueue: this.updateQueue
             }
-            this.socket.emit("event", message);
+            this.socket.emit('event', message);
             this.updateQueue = [];
         }
     }
 
     private _hasCollision(state: Player.State, staticObjects: Scene.StaticObject[]) {
         return staticObjects.some(staticObject => {
-            return this._getCorners(state).some(corner => {
+            return Helpers.getCorners(state.position, this.size).some(corner => {
                 return staticObject.blocksPoint(corner);
             })
         });
-    }
-
-    private _getCorners(state: Player.State): Helpers.Coordinate[] {
-        return [
-            {x: state.position.x, y: state.position.y },
-            {x: state.position.x + this.size.width, y: state.position.y },
-            {x: state.position.x + this.size.width, y: state.position.y + this.size.height },
-            {x: state.position.x, y: state.position.y + this.size.height }
-        ]
     }
 }

@@ -1,21 +1,23 @@
-import * as Helpers from "./helpers";
-import * as Player from "./Player";
-import * as OtherPlayer from "./OtherPlayer";
-import * as CurrentPlayer from "./CurrentPlayer";
-import * as ServerInterfaces from "../../ServerInterfaces";
+import * as Helpers from './helpers';
+import { Player } from './Player';
+import { OtherPlayer } from './OtherPlayer';
+import { CurrentPlayer } from './CurrentPlayer';
+import * as ServerInterfaces from '../../ServerInterfaces';
+import { FuelingStation } from "./FuelingStation";
 
 export interface WorldObject {
-    objectType: "sprite" | "solid";
+    objectType: 'sprite' | 'static';
+    zIndex?: number | undefined;
     render(canvas: HTMLCanvasElement): void;
 }
 
 export interface StaticObject extends WorldObject {
-    objectType: "solid"
+    objectType: 'static'
     blocksPoint: (testPoint: Helpers.Coordinate) => boolean;
 }
 
 export interface Sprite extends WorldObject {
-    objectType: "sprite"
+    objectType: 'sprite'
     updateState(scene: Scene): void;
     render(canvas: HTMLCanvasElement): void;
 }
@@ -35,25 +37,25 @@ export type State = {
 export class Scene {
     socket: SocketIOClient.Socket;
     staticObjects: StaticObject[];
-    players: Player.Player[];
+    sprites: Sprite[];
     state: State;
     currentPlayerName: string | null;
-    addPlayerCallback: () => void;
+    onAddPlayer: (gamePhase: ServerInterfaces.GamePhase) => void;
 
     constructor({
         socket,
         staticObjects,
-        addPlayerCallback
+        onAddPlayer,
     }: {
         socket: SocketIOClient.Socket,
         staticObjects: StaticObject[],
-        addPlayerCallback: () => void
+        onAddPlayer: (gamePhase: ServerInterfaces.GamePhase) => void
     }) {
         this.socket = socket;
-        this.players = [];
+        this.sprites = [];
         this.staticObjects = staticObjects;
         this.currentPlayerName = null;
-        this.addPlayerCallback  = addPlayerCallback;
+        this.onAddPlayer = onAddPlayer;
         this.state = {
             ticks: 0,
             keyboard: {
@@ -66,43 +68,34 @@ export class Scene {
             }
         };
 
-        this.socket.on("event", (message: ServerInterfaces.ServerResponse) => {
-            if (message.eventName === "register_user") {
+        this.socket.on('event', (message: ServerInterfaces.ServerResponse) => {
+            if (message.eventName === 'register_user') {
                 this._addNewPlayers(message);
             }
         });
     }
 
     private _addNewPlayers = (message: ServerInterfaces.RegisterUserResponse) => {
-        const newPlayerDescriptors = message.allPlayers.filter(
-            playerDescriptor => this.players.findIndex(
-                player => player.name === playerDescriptor.name
+        const newPlayersAndStations = message.allPlayers.filter(
+            playerAndStation => this.sprites.findIndex(
+                sprite => (sprite instanceof Player) && sprite.descriptor.name === playerAndStation.descriptor.name
             ) === -1
         );
 
-        const newPlayers = newPlayerDescriptors.map(playerDescriptor =>
-            this.currentPlayerName !== null && this.currentPlayerName === playerDescriptor.name
-                ? new CurrentPlayer.CurrentPlayer(this.socket, playerDescriptor)
-                : new OtherPlayer.OtherPlayer(this.socket, playerDescriptor)
+        const newPlayers = newPlayersAndStations.map(playerAndStation =>
+            this.currentPlayerName !== null && this.currentPlayerName === playerAndStation.descriptor.name
+                ? new CurrentPlayer(this.socket, playerAndStation.descriptor, 2)
+                : new OtherPlayer(this.socket, playerAndStation.descriptor, 1)
         );
 
-        this.players = this.players.concat(newPlayers);
+        const newFuelingStations = newPlayersAndStations.map(playerAndStation =>
+            new FuelingStation(this.socket, playerAndStation.fuelingStation, 0)
+        );
 
-        // move the current player to the back, so it's always rendered last and on top
-        const currentPlayer = this.currentPlayer();
-        const currentPlayerIndex = currentPlayer !== null
-            ? this.players.indexOf(currentPlayer)
-            : -1;
+        this.sprites = this.sprites.concat(newPlayers).concat(newFuelingStations);
 
-        if (currentPlayerIndex !== -1) {
-            this.players.push(
-                // removes the element from this.players, and returns it as an array
-                this.players.splice(currentPlayerIndex, 1)[0]
-            );
-        }
-
-        if (newPlayers.length !== 0) {
-            this.addPlayerCallback();
+        if (newPlayersAndStations.length > 0) {
+            this.onAddPlayer(message.room.gamePhase);
         }
     }
 
@@ -110,22 +103,35 @@ export class Scene {
         const context = Helpers.getContext(canvas);
 
         context.clearRect(0, 0, canvas.width, canvas.height);
-        this.staticObjects.forEach(staticObject => {
-            staticObject.render(canvas);
-        })
-        this.players.forEach(player => {
-            player.render(canvas);
+
+        const allWorldObjectsByZIndex = [...this.staticObjects, ...this.sprites].sort((worldObject1, worldObject2) => {
+            if (worldObject1.zIndex === worldObject2.zIndex) {
+                return 0;
+            }
+            // Put undefined at the top
+            else if (worldObject1.zIndex === undefined) {
+                return -1;
+            }
+            else if (worldObject2.zIndex === undefined) {
+                return 1;
+            }
+            else {
+                return worldObject1.zIndex - worldObject2.zIndex;
+            }
         });
+
+        allWorldObjectsByZIndex.forEach(worldObject => worldObject.render(canvas));
     }
 
     private _updateState() {
         this.state.ticks += 1;
-        this.players.forEach(player => { player.updateState(this) });
+        this.sprites.forEach(sprite => { sprite.updateState(this) });
     }
 
     currentPlayer() {
-        const currentPlayer = this.players.filter(player => player.name === this.currentPlayerName)[0];
-        return currentPlayer ? currentPlayer : null;
+        // Filter uses a typeguard, so this is safe
+        const currentPlayer = this.sprites.filter(sprite => (sprite instanceof CurrentPlayer))[0] as CurrentPlayer | undefined;
+        return currentPlayer !== undefined ? currentPlayer : null;
     }
 
     run(canvas: HTMLCanvasElement) {

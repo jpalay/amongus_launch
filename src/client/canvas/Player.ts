@@ -1,6 +1,6 @@
-import * as Scene from "./Scene";
-import * as Helpers from "./helpers";
-import * as ServerInterfaces from "../../ServerInterfaces";
+import * as Scene from './Scene';
+import * as Helpers from './helpers';
+import * as ServerInterfaces from '../../ServerInterfaces';
 
 export type State = {
     position: Helpers.Coordinate;
@@ -9,28 +9,19 @@ export type State = {
 }
 
 export class Player implements Scene.Sprite {
-    objectType: "sprite";
     socket: SocketIOClient.Socket;
-    name: string;
-    id: string;
-    color: ServerInterfaces.Color;
-    isAdmin: boolean;
-    room: ServerInterfaces.Room;
-    size: Helpers.Dimensions;
+    descriptor: ServerInterfaces.PlayerDescriptor;
     state: State;
+    zIndex: number;
 
-    constructor(socket: SocketIOClient.Socket, player: ServerInterfaces.PlayerDescriptor) {
-        this.id = player.id;
-        this.name = player.name;
-        this.state = player.initialState;
-        this.room = player.room;
-        this.color = player.color;
-        this.isAdmin = player.isAdmin;
+    objectType: 'sprite' = 'sprite';
+    size: Helpers.Dimensions = { width: 20, height: 25 };
 
+    constructor(socket: SocketIOClient.Socket, descriptor: ServerInterfaces.PlayerDescriptor, zIndex: number) {
+        this.zIndex = zIndex;
         this.socket = socket;
-
-        this.objectType = "sprite";
-        this.size = { width: 40, height: 50 };
+        this.descriptor = descriptor;
+        this.state = descriptor.initialState;
     }
 
     private _getImage() {
@@ -38,7 +29,7 @@ export class Player implements Scene.Sprite {
         return (document.getElementById(`red${imageNumber}`) as HTMLImageElement);
     }
 
-    _center(): Helpers.Coordinate {
+    center(): Helpers.Coordinate {
         return {
             x: this.state.position.x + this.size.width / 2,
             y: this.state.position.y + this.size.height / 2
@@ -71,25 +62,18 @@ export class Player implements Scene.Sprite {
         context.save();
         context.font = '10px sans-serif';
         context.textAlign = 'center';
-        const center = this._center();
+        const center = this.center();
         const textX = center.x;
         const textY = center.y + this.size.height / 2 + 12;
-        context.fillText(this.name, textX, textY, 90);
+        context.fillText(this.descriptor.name, textX, textY, 90);
         context.restore()
     }
 
     updateState(scene: Scene.Scene) {
-		throw Error("not yet implemented");
+		throw Error('not yet implemented');
     }
 
     toDescriptor(): ServerInterfaces.PlayerDescriptor {
-        return {
-            name: this.name,
-            id: this.id,
-            isAdmin: this.isAdmin,
-            color: this.color,
-            room: this.room,
-            initialState: this.state,
-        }
+        return this.descriptor;
     }
 }

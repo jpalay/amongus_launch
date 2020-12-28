@@ -1,133 +1,184 @@
 // tslint:disable:no-console
-import { Server, Socket } from "socket.io";
-import { v4 as uuidv4 } from "uuid";
-import lowdb from "lowdb"
-import FileSync from "lowdb/adapters/FileSync"
+import { Server, Socket } from 'socket.io';
+import { v4 as uuidv4 } from 'uuid';
+import lowdb from 'lowdb'
+import FileSync from 'lowdb/adapters/FileSync'
 
-import { Room, PlayerDescriptor } from "./ServerInterfaces";
-import * as ServerInterfaces from "./ServerInterfaces";
+import { Room, PlayerDescriptor, FuelingStationDescriptor } from './ServerInterfaces';
+import * as ServerInterfaces from './ServerInterfaces';
 
 
 type Schema = {
     players: PlayerDescriptor[]
     rooms: Room[],
+    fuelingStations: ServerInterfaces.FuelingStationDescriptor[],
 }
 
-const adapter = new FileSync<Schema>("db.json");
+const adapter = new FileSync<Schema>('db.json');
 const db = lowdb(adapter);
 
-db.defaults({ players: [], rooms: [] }).write()
+const MAX_ROOM_SIZE = 13;
+const FUELING_STATION_LOCATIONS = [
+    { x: 300, y: 200 },
+    { x: 300, y: 300 },
+    { x: 300, y: 400 },
+    { x: 300, y: 500 },
+    { x: 300, y: 600 },
 
-const _getOrCreateRoom = (roomName: string) => {
-    const existingRoom = db.get("rooms").find({name: roomName }).value();
+    { x: 400, y: 200 },
+    { x: 400, y: 300 },
+    { x: 400, y: 400 },
+    { x: 400, y: 500 },
+    { x: 400, y: 600 },
 
-    if (existingRoom !== undefined) {
-        return { room: existingRoom, existingRoom: true };
-    } else {
-        const room = { name: roomName, gamePhase: "lobby" as const };
-        db.get("rooms").push(room).write();
-        return { room, existingRoom: false};
-    }
+    { x: 500, y: 300 },
+    { x: 500, y: 400 },
+    { x: 500, y: 500 },
+];
+
+db.defaults({ players: [], rooms: [], fuelingStations: [] }).write()
+
+export default (io: Server) => {
+    io.on('connection', socket => {
+        socket.on('event', (message: ServerInterfaces.RequestParams) => {
+            const params = message as ServerInterfaces.RequestParams;
+            console.log('============== received params ==============')
+            console.log(params)
+            console.log('============== done receiving params ==============')
+
+            switch (params.eventName) {
+                case 'register_user':
+                    _registerUser(params, socket, io);
+                    break;
+
+                case 'start_game':
+                    _startGame(params, socket, io);
+                    break;
+
+                case 'update_state':
+                    _updateState(params, socket, io)
+            }
+        });
+    });
 }
 
-const _getOrCreatePlayer = (
-    lookupKey: Partial<PlayerDescriptor>,
-    descriptor: PlayerDescriptor
-) => {
-    const existingPlayer = db.get("players").find(lookupKey).value();
-    if (existingPlayer !== undefined) {
-        return existingPlayer;
-    } else {
-        db.get("players").push(descriptor).write();
-        return descriptor;
-    }
-}
+/***********************
+ * MESSAGE HANDLERS
+ ***********************/
 
 const _registerUser = (params: ServerInterfaces.RegisterUserParams, socket: Socket, io: Server) => {
     db.read();
     const { room, existingRoom } = _getOrCreateRoom(params.roomName);
     const isAdmin = !existingRoom;
 
-    const playerDescriptor = _getOrCreatePlayer(
-        { name: params.userName, room },
+    const currentPlayerDescriptor = _getOrCreatePlayer(
+        room.name,
+        params.userName,
         {
-            room,
+            roomName: room.name,
             name: params.userName,
             isAdmin,
             id: uuidv4(),
             color: params.color,
             initialState: {
-                position: {x: 400, y: 400},
+                position: { x: 400, y: 400 },
                 facingLeft: false,
                 walkingTicks: 0
             }
         }
-    )
+    );
 
     db.read();
-    const allPlayers = db.get("players").filter({ room }).value()
+    const allPlayers = db.get('players').filter({ roomName: room.name }).value().map(playerDescriptor => ({
+        descriptor: playerDescriptor,
+        fuelingStation: db.get('fuelingStations').find({ playerId: playerDescriptor.id }).value()
+    }))
 
     const response: ServerInterfaces.RegisterUserResponse = {
-        eventName: "register_user",
-        registeredPlayer: playerDescriptor,
+        eventName: 'register_user',
+        room,
+        registeredPlayer: {
+            descriptor: currentPlayerDescriptor,
+            fuelingStation: db.get('fuelingStations').find({ playerId: currentPlayerDescriptor.id }).value()
+        },
         allPlayers,
         gamePhase: room.gamePhase
     };
 
-    console.log(response);
-
     socket.join(room.name);
-    io.in(room.name).emit("event", response)
+    _broadcastMessage(io, room.name, response);
 }
-
 
 const _startGame = (params: ServerInterfaces.StartGameParams, socket: Socket, io: Server) => {
-    console.log("starting game");
     db.read();
-    db.get("rooms").find({ name: params.roomName }).assign({ gamePhase: "run_game" }).write();
-    const room = db.get("rooms").find({ name: params.roomName }).value();
+    db.get('rooms').find({ name: params.roomName }).assign({ gamePhase: 'run_game' }).write();
+    const room = db.get('rooms').find({ name: params.roomName }).value();
 
     const response: ServerInterfaces.StartGameResponse = {
-        eventName: "start_game",
-        allPlayers: db.get("players").filter({ room }).value()
+        eventName: 'start_game',
+        allPlayers: db.get('players').filter({ roomName: room.name }).value()
     }
-    console.log("emitting start_game response to", params.roomName);
-    io.in(params.roomName).emit("event", response);
+
+    _broadcastMessage(io, room.name, response);
 }
+
 
 const _updateState = (params: ServerInterfaces.UpdateStateParams, socket: Socket, io: Server) => {
     db.read();
-    const { room } = db.get("players").find({id: params.playerId}).value();
+    const { roomName } = db.get('players').find({id: params.playerId}).value();
     const response: ServerInterfaces.UpdateStateResponse = {
-        eventName: "update_state",
+        eventName: 'update_state',
         playerId: params.playerId,
         updateQueue: params.updateQueue,
     }
-    io.in(room.name).emit("event", response);
+    _broadcastMessage(io, roomName, response);
 }
 
+/***********************
+ * HELPERS
+ ***********************/
 
-export default (io: Server) => {
-    io.on("connection", socket => {
-        socket.on("event", (message: ServerInterfaces.RequestParams) => {
-            // tslint:disable-next-line:no-console
-            const params = message as ServerInterfaces.RequestParams;
-            console.log("received params")
-            console.log(params)
-            console.log("done receiving params")
+const _broadcastMessage = (io: Server, roomName: string, response: ServerInterfaces.ServerResponse) => {
+    console.log('============== sending response ==============')
+    console.log(response)
+    io.in(roomName).emit('event', response);
+    console.log('============== done sending response ==============')
+}
 
-            switch (params.eventName) {
-                case "register_user":
-                    _registerUser(params, socket, io);
-                    break;
+const _getOrCreateRoom = (roomName: string) => {
+    const existingRoom = db.get('rooms').find({name: roomName }).value();
 
-                case "start_game":
-                    _startGame(params, socket, io);
-                    break;
+    if (existingRoom !== undefined) {
+        return { room: existingRoom, existingRoom: true };
+    } else {
+        const room = { name: roomName, gamePhase: 'lobby' as const };
+        db.get('rooms').push(room).write();
+        return { room, existingRoom: false};
+    }
+}
 
-                case "update_state":
-                    _updateState(params, socket, io)
-            }
-        });
-    });
+const _getOrCreatePlayer = (
+    roomName: string,
+    name: string,
+    descriptor: PlayerDescriptor
+) => {
+    const existingPlayer = db.get('players').find({roomName, name}).value();
+    if (existingPlayer !== undefined) {
+        return existingPlayer;
+    } else {
+        const currentRoomSize = db.get('players').filter({ roomName }).value().length;
+        if (currentRoomSize > MAX_ROOM_SIZE) {
+            throw new Error('too many players in the room')
+        }
+
+        db.get('players').push(descriptor).write();
+        db.get('fuelingStations').push({
+            roomName,
+            playerId: descriptor.id,
+            position: FUELING_STATION_LOCATIONS[currentRoomSize],
+        }).write();
+        console.log("wrote to fuelingStations");
+
+        return descriptor;
+    }
 }

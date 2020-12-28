@@ -1,8 +1,9 @@
-import * as Player from "./client/canvas/Player";
+import * as Player from './client/canvas/Player';
+import * as Helpers from './client/canvas/helpers';
 
-export const Colors = ["teal", "red", "blue", "purple", "brown", "black", "pink"] as const;
+export const Colors = ['teal', 'red', 'blue', 'purple', 'brown', 'black', 'pink'] as const;
 export type Color = (typeof Colors)[number];
-export type GamePhase ="lobby" | "run_game";
+export type GamePhase ='join_game' | 'join_game_pending' | 'lobby' | 'run_game';
 export type Room = { name: string, gamePhase: GamePhase};
 
 export type PlayerDescriptor = {
@@ -10,37 +11,50 @@ export type PlayerDescriptor = {
     name: string;
     isAdmin: boolean;
     color: Color;
-    room: Room;
+    roomName: string;
     initialState: Player.State
 }
 
+export type FuelingStationDescriptor = {
+    roomName: string;
+    playerId: string;
+    position: Helpers.Coordinate;
+}
+
 export type RegisterUserParams = {
-    eventName: "register_user";
+    eventName: 'register_user';
     roomName: string;
     color: Color;
     userName: string;
 }
 
 export type StartGameParams = {
-    eventName: "start_game";
+    eventName: 'start_game';
     roomName: string;
 }
 
 export type UpdateStateParams = {
-    eventName: "update_state";
+    eventName: 'update_state';
     playerId: string;
     updateQueue: Player.State[],
 };
 
 export type RegisterUserResponse = {
-    eventName: "register_user";
-    registeredPlayer: PlayerDescriptor;
-    allPlayers: PlayerDescriptor[];
+    eventName: 'register_user';
+    room: Room,
+    registeredPlayer: {
+        descriptor: PlayerDescriptor;
+        fuelingStation: FuelingStationDescriptor;
+    };
+    allPlayers: {
+        descriptor: PlayerDescriptor;
+        fuelingStation: FuelingStationDescriptor;
+    }[];
     gamePhase: GamePhase;
 }
 
 export type StartGameResponse = {
-    eventName: "start_game";
+    eventName: 'start_game';
     allPlayers: PlayerDescriptor[];
 }
 export type UpdateStateResponse = UpdateStateParams;
