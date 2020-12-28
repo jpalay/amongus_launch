@@ -5,13 +5,12 @@ export type Color = (typeof Colors)[number];
 export type GamePhase ="lobby" | "run_game";
 export type Room = { name: string, gamePhase: GamePhase};
 
-
 export type PlayerDescriptor = {
-    roomName: string;
     id: string;
     name: string;
     isAdmin: boolean;
     color: Color;
+    room: Room;
     initialState: Player.State
 }
 
@@ -22,21 +21,9 @@ export type RegisterUserParams = {
     userName: string;
 }
 
-export type RegisterUserResponse = {
-    eventName: "register_user";
-    registeredPlayer: PlayerDescriptor;
-    allPlayers: PlayerDescriptor[];
-    gamePhase: GamePhase;
-}
-
 export type StartGameParams = {
     eventName: "start_game";
     roomName: string;
-}
-
-export type StartGameResponse = {
-    eventName: "start_game";
-    allPlayers: PlayerDescriptor[];
 }
 
 export type UpdateStateParams = {
@@ -45,6 +32,17 @@ export type UpdateStateParams = {
     updateQueue: Player.State[],
 };
 
+export type RegisterUserResponse = {
+    eventName: "register_user";
+    registeredPlayer: PlayerDescriptor;
+    allPlayers: PlayerDescriptor[];
+    gamePhase: GamePhase;
+}
+
+export type StartGameResponse = {
+    eventName: "start_game";
+    allPlayers: PlayerDescriptor[];
+}
 export type UpdateStateResponse = UpdateStateParams;
 
 export type RequestParams = RegisterUserParams | StartGameParams | UpdateStateParams;

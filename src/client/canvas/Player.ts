@@ -8,22 +8,26 @@ export type State = {
     walkingTicks: number;
 }
 
-
 export class Player implements Scene.Sprite {
     objectType: "sprite";
     socket: SocketIOClient.Socket;
     name: string;
     id: string;
+    color: ServerInterfaces.Color;
     isAdmin: boolean;
+    room: ServerInterfaces.Room;
     size: Helpers.Dimensions;
     state: State;
 
     constructor(socket: SocketIOClient.Socket, player: ServerInterfaces.PlayerDescriptor) {
-        this.name = player.name;
-        this.socket = socket;
         this.id = player.id;
+        this.name = player.name;
         this.state = player.initialState;
+        this.room = player.room;
+        this.color = player.color;
         this.isAdmin = player.isAdmin;
+
+        this.socket = socket;
 
         this.objectType = "sprite";
         this.size = { width: 40, height: 50 };
@@ -76,5 +80,16 @@ export class Player implements Scene.Sprite {
 
     updateState(scene: Scene.Scene) {
 		throw Error("not yet implemented");
+    }
+
+    toDescriptor(): ServerInterfaces.PlayerDescriptor {
+        return {
+            name: this.name,
+            id: this.id,
+            isAdmin: this.isAdmin,
+            color: this.color,
+            room: this.room,
+            initialState: this.state,
+        }
     }
 }

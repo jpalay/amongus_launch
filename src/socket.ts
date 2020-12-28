@@ -36,14 +36,8 @@ const _getOrCreatePlayer = (
 ) => {
     const existingPlayer = db.get("players").find(lookupKey).value();
     if (existingPlayer !== undefined) {
-        // tslint:disable-next-line:no-console
-        console.log("found existing player");
         return existingPlayer;
     } else {
-        // tslint:disable-next-line:no-console
-        console.log("creating new player")
-        // tslint:disable-next-line:no-console
-        console.log("descriptor", descriptor)
         db.get("players").push(descriptor).write();
         return descriptor;
     }
@@ -55,9 +49,9 @@ const _registerUser = (params: ServerInterfaces.RegisterUserParams, socket: Sock
     const isAdmin = !existingRoom;
 
     const playerDescriptor = _getOrCreatePlayer(
-        {name: params.userName, roomName: params.roomName},
+        { name: params.userName, room },
         {
-            roomName: room.name,
+            room,
             name: params.userName,
             isAdmin,
             id: uuidv4(),
@@ -71,9 +65,7 @@ const _registerUser = (params: ServerInterfaces.RegisterUserParams, socket: Sock
     )
 
     db.read();
-    const allPlayers = db.get("players").filter({
-        "roomName": room.name
-    }).value()
+    const allPlayers = db.get("players").filter({ room }).value()
 
     const response: ServerInterfaces.RegisterUserResponse = {
         eventName: "register_user",
@@ -93,10 +85,11 @@ const _startGame = (params: ServerInterfaces.StartGameParams, socket: Socket, io
     console.log("starting game");
     db.read();
     db.get("rooms").find({ name: params.roomName }).assign({ gamePhase: "run_game" }).write();
+    const room = db.get("rooms").find({ name: params.roomName }).value();
 
     const response: ServerInterfaces.StartGameResponse = {
         eventName: "start_game",
-        allPlayers: db.get("players").filter({ "roomName": params.roomName }).value()
+        allPlayers: db.get("players").filter({ room }).value()
     }
     console.log("emitting start_game response to", params.roomName);
     io.in(params.roomName).emit("event", response);
@@ -104,13 +97,13 @@ const _startGame = (params: ServerInterfaces.StartGameParams, socket: Socket, io
 
 const _updateState = (params: ServerInterfaces.UpdateStateParams, socket: Socket, io: Server) => {
     db.read();
-    const { roomName } = db.get("players").find({id: params.playerId}).value();
+    const { room } = db.get("players").find({id: params.playerId}).value();
     const response: ServerInterfaces.UpdateStateResponse = {
         eventName: "update_state",
         playerId: params.playerId,
         updateQueue: params.updateQueue,
     }
-    io.in(roomName).emit("event", response);
+    io.in(room.name).emit("event", response);
 }
 
 
