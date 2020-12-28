@@ -1,4 +1,5 @@
 **/*.sw[nop]
+*idea/*
 package-lock.json
 db.json
 dist/*
