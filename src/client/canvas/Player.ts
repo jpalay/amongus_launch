@@ -1,6 +1,6 @@
-import * as Scene from './Scene';
-import * as Helpers from './helpers';
-import * as ServerInterfaces from '../../ServerInterfaces';
+import * as Scene from "./Scene";
+import * as Helpers from "./helpers";
+import * as ServerInterfaces from "../../ServerInterfaces";
 
 export type State = {
     position: Helpers.Coordinate;
@@ -14,7 +14,7 @@ export class Player implements Scene.Sprite {
     state: State;
     zIndex: number;
 
-    objectType: 'sprite' = 'sprite';
+    objectType: "sprite" = "sprite";
     size: Helpers.Dimensions = { width: 20, height: 25 };
 
     constructor(socket: SocketIOClient.Socket, descriptor: ServerInterfaces.PlayerDescriptor, zIndex: number) {
@@ -60,8 +60,8 @@ export class Player implements Scene.Sprite {
         context.restore();
 
         context.save();
-        context.font = '10px sans-serif';
-        context.textAlign = 'center';
+        context.font = "10px sans-serif";
+        context.textAlign = "center";
         const center = this.center();
         const textX = center.x;
         const textY = center.y + this.size.height / 2 + 12;
@@ -70,7 +70,7 @@ export class Player implements Scene.Sprite {
     }
 
     updateState(scene: Scene.Scene) {
-		throw Error('not yet implemented');
+		throw Error("not yet implemented");
     }
 
     toDescriptor(): ServerInterfaces.PlayerDescriptor {

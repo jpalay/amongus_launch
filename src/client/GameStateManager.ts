@@ -1,9 +1,9 @@
-import m from 'mithril';
+import m from "mithril";
 
-import * as ServerInterfaces from '../ServerInterfaces';
-import * as Scene from './canvas/Scene'
-import * as Player from './canvas/Player'
-import * as OctogonalWall from './canvas/OctogonalWall'
+import * as ServerInterfaces from "../ServerInterfaces";
+import * as Scene from "./canvas/Scene"
+import * as Player from "./canvas/Player"
+import * as OctogonalWall from "./canvas/OctogonalWall"
 
 export type State = {
     gamePhase: ServerInterfaces.GamePhase;
@@ -22,9 +22,9 @@ export class GameStateManager {
     scene: Scene.Scene; 
 
     state: State = {
-        gamePhase: 'join_game',
-        userName: '',
-        roomName: '',
+        gamePhase: "join_game",
+        userName: "",
+        roomName: "",
         playerNames: []
     };
 
@@ -41,7 +41,7 @@ export class GameStateManager {
             staticObjects: [
                 new OctogonalWall.OctogonalWall(
                     800,
-                    { width: 900, height: 900 }
+                    ServerInterfaces.CANVAS_SIZE
                 )
             ],
             onAddPlayer: (gamePhase) => { this._refreshPlayerList(gamePhase) }
@@ -51,10 +51,9 @@ export class GameStateManager {
     }
 
     private _initializeSockets() {
-        this.socket.on('event', (message: ServerInterfaces.ServerResponse) => {
-            // TODO: client should tell server what state to transition to in order to accomodate joining mid-game
+        this.socket.on("event", (message: ServerInterfaces.ServerResponse) => {
             switch (message.eventName) {
-                case 'start_game':
+                case "start_game":
                     this._handleStartGameResponse(message)
                     break;
             }
@@ -67,13 +66,13 @@ export class GameStateManager {
 
     view() {
         switch (this.state.gamePhase) {
-            case 'join_game':
+            case "join_game":
                 return this._renderForm();
-            case 'join_game_pending':
+            case "join_game_pending":
                 return this._renderJoinGamePending();
-            case 'lobby':
+            case "lobby":
                 return this._renderLobby();
-            case 'run_game':
+            case "run_game":
                 return this._renderGame();
             default:
                 return null;
@@ -81,48 +80,45 @@ export class GameStateManager {
     }
 
     private _renderForm() {
-        return m('div', [
-            m('input', {
-                type: 'text',
-                placeholder: 'username',
+        return m("div", [
+            m("input", {
+                type: "text",
+                placeholder: "username",
                 oninput: (e: InputEvent) => { this.state.userName = (<HTMLInputElement>e.target)!.value }
             }),
-            m('input', {
-                type: 'text',
-                placeholder: 'room name',
+            m("input", {
+                type: "text",
+                placeholder: "room name",
                 oninput: (e: InputEvent) => { this.state.roomName = (<HTMLInputElement>e.target)!.value }
             }),
-            m('button', {
+            m("button", {
                 onclick: () => this._registerUser()
-            }, 'join game')
+            }, "join game")
 
         ]);
     }
 
     private _renderJoinGamePending() {
-        return m('span', 'waiting for server response...');
+        return m("span", "waiting for server response...");
     }
 
     private _renderLobby() {
         const startGameButton = this.scene.currentPlayer()?.descriptor.isAdmin
-            ? m('button', { onclick: () => this._startGame() }, 'start game')
+            ? m("button", { onclick: () => this._startGame() }, "start game")
             : null;
 
-        return m('div', [
-            m('ul', this.state.playerNames.map(playerName => m('li', playerName))),
+        return m("div", [
+            m("ul", this.state.playerNames.map(playerName => m("li", playerName))),
             startGameButton
         ])
     }
 
     private _renderGame() {
-        return m('canvas#GameCanvas', {
-            width: 900,
-            height: 900
-        });
+        return m("canvas#GameCanvas", ServerInterfaces.CANVAS_SIZE);
     }
 
     onupdate() {
-        const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById('GameCanvas');
+        const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById("GameCanvas");
         if (canvas != null && this.gameLoopInterval === null) {
             this.gameLoopInterval = this.scene.run(canvas);
         }
@@ -138,18 +134,18 @@ export class GameStateManager {
         this.scene.currentPlayerName = userName;
 
         const message: ServerInterfaces.RegisterUserParams = {
-            eventName: 'register_user',
+            eventName: "register_user",
             roomName,
-            color: 'red',
+            color: "red",
             userName,
         };
-        this.state.gamePhase = 'join_game_pending';
-        this.socket.emit('event', message);
+        this.state.gamePhase = "join_game_pending";
+        this.socket.emit("event", message);
     }
 
     private _startGame() {
-        this.socket.emit('event', {
-            eventName: 'start_game',
+        this.socket.emit("event", {
+            eventName: "start_game",
             roomName: this.state.roomName
         })
     }
@@ -159,8 +155,8 @@ export class GameStateManager {
      ***************************/
 
     _handleStartGameResponse(message: ServerInterfaces.StartGameResponse) {
-        if (this.state.gamePhase === 'lobby') {
-            this.state.gamePhase = 'run_game';
+        if (this.state.gamePhase === "lobby") {
+            this.state.gamePhase = "run_game";
             m.redraw()
         }
     }
@@ -176,12 +172,12 @@ export class GameStateManager {
             // filter uses a typeguard, so this is safe
             .map(player => (<Player.Player>player).descriptor.name);
 
-        if (this.state.gamePhase === 'join_game_pending') {
+        if (this.state.gamePhase === "join_game_pending") {
             this.state.gamePhase = gamePhase;
             m.redraw();
         }
         
-        if (this.state.gamePhase === 'lobby') {
+        if (this.state.gamePhase === "lobby") {
             m.redraw();
         }
     }

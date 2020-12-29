@@ -1,6 +1,6 @@
-import * as Player from './Player';
-import * as Scene from './Scene';
-import * as ServerInterfaces from '../../ServerInterfaces';
+import * as Player from "./Player";
+import * as Scene from "./Scene";
+import * as ServerInterfaces from "../../ServerInterfaces";
 
 export class OtherPlayer extends Player.Player {
     private updateQueue: Player.State[];
@@ -9,9 +9,9 @@ export class OtherPlayer extends Player.Player {
         super(socket, descriptor, zIndex);
         this.updateQueue = [];
 
-        this.socket.on('event', (message: ServerInterfaces.ServerResponse) => {
+        this.socket.on("event", (message: ServerInterfaces.ServerResponse) => {
             switch (message.eventName) {
-                case 'update_state':
+                case "update_state":
                     this._updateStateFromServer(message)
                     break;
             }

@@ -1,23 +1,23 @@
-import * as Helpers from './helpers';
-import { Player } from './Player';
-import { OtherPlayer } from './OtherPlayer';
-import { CurrentPlayer } from './CurrentPlayer';
-import * as ServerInterfaces from '../../ServerInterfaces';
+import * as Helpers from "./helpers";
+import { Player } from "./Player";
+import { OtherPlayer } from "./OtherPlayer";
+import { CurrentPlayer } from "./CurrentPlayer";
+import * as ServerInterfaces from "../../ServerInterfaces";
 import { FuelingStation } from "./FuelingStation";
 
 export interface WorldObject {
-    objectType: 'sprite' | 'static';
+    objectType: "sprite" | "static";
     zIndex?: number | undefined;
     render(canvas: HTMLCanvasElement): void;
 }
 
 export interface StaticObject extends WorldObject {
-    objectType: 'static'
+    objectType: "static"
     blocksPoint: (testPoint: Helpers.Coordinate) => boolean;
 }
 
 export interface Sprite extends WorldObject {
-    objectType: 'sprite'
+    objectType: "sprite"
     updateState(scene: Scene): void;
     render(canvas: HTMLCanvasElement): void;
 }
@@ -26,6 +26,7 @@ export type State = {
     ticks: number;
     keyboard: {
         space: boolean;
+        f: boolean;
     },
     mouse: {
         x: number;
@@ -59,7 +60,8 @@ export class Scene {
         this.state = {
             ticks: 0,
             keyboard: {
-                space: false
+                space: false,
+                f: false
             },
             mouse: {
                 x: 0,
@@ -68,8 +70,8 @@ export class Scene {
             }
         };
 
-        this.socket.on('event', (message: ServerInterfaces.ServerResponse) => {
-            if (message.eventName === 'register_user') {
+        this.socket.on("event", (message: ServerInterfaces.ServerResponse) => {
+            if (message.eventName === "register_user") {
                 this._addNewPlayers(message);
             }
         });
@@ -134,31 +136,54 @@ export class Scene {
         return currentPlayer !== undefined ? currentPlayer : null;
     }
 
+    addSprite(sprite: Sprite) {
+        this.sprites.push(sprite);
+    }
+
+    removeSprite(sprite: Sprite) {
+        const index = this.sprites.findIndex(obj => obj === sprite);
+        if (index !== -1) {
+            this.sprites.splice(index, 1);
+        }
+    }
+
     run(canvas: HTMLCanvasElement) {
         // add keyboard listeners
-        document.addEventListener('keydown', event => {
-            if (event.keyCode === 32) {
+        document.addEventListener("keydown", event => {
+            if (event.key === " ") {
                 this.state.keyboard.space = true;
             }
         });
 
-        document.addEventListener('keyup', event => {
-            if (event.keyCode === 32) {
+        document.addEventListener("keyup", event => {
+            if (event.key === " ") {
                 this.state.keyboard.space = false;
             }
         });
 
+        document.addEventListener("keydown", event => {
+            if (event.key === "f") {
+                this.state.keyboard.f = true;
+            }
+        });
+
+        document.addEventListener("keyup", event => {
+            if (event.key === "f") {
+                this.state.keyboard.f = false;
+            }
+        });
+
         // add mouse listeners
-        document.addEventListener('mousemove', event => {
+        document.addEventListener("mousemove", event => {
             this.state.mouse.x = event.clientX - canvas.getBoundingClientRect().left;
             this.state.mouse.y = event.clientY - canvas.getBoundingClientRect().top;
         });
 
-        document.addEventListener('mousedown', event => {
+        document.addEventListener("mousedown", () => {
             this.state.mouse.pressed = true;
         });
 
-        document.addEventListener('mouseup', event => {
+        document.addEventListener("mouseup", () => {
             this.state.mouse.pressed = false;
         });
 

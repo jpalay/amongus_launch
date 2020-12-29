@@ -1,7 +1,7 @@
-import * as Player from './Player';
-import * as Scene from './Scene';
-import * as Helpers from './helpers';
-import * as ServerInterfaces from '../../ServerInterfaces';
+import * as Player from "./Player";
+import * as Scene from "./Scene";
+import * as Helpers from "./helpers";
+import * as ServerInterfaces from "../../ServerInterfaces";
 
 export class CurrentPlayer extends Player.Player {
     maxSpeed: number;
@@ -95,11 +95,11 @@ export class CurrentPlayer extends Player.Player {
     private _sendUpdateQueue = () => {
         if (this.updateQueue.length > 0) {
             const message: ServerInterfaces.UpdateStateParams = {
-                eventName: 'update_state',
+                eventName: "update_state",
                 playerId: this.descriptor.id,
                 updateQueue: this.updateQueue
             }
-            this.socket.emit('event', message);
+            this.socket.emit("event", message);
             this.updateQueue = [];
         }
     }

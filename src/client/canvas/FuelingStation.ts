@@ -1,20 +1,29 @@
-import * as Scene from './Scene'
-import * as ServerInterfaces from '../../ServerInterfaces'
-import * as Helpers from './helpers'
+import * as Scene from "./Scene"
+import * as ServerInterfaces from "../../ServerInterfaces"
+import * as Helpers from "./helpers"
+import { FuelDialog } from "./FuelDialog";
 
 export type State = {
     canBeActivated: boolean;
+    dialogOpen: boolean;
+    fullyFueled: boolean;
 }
 
 export class FuelingStation implements Scene.Sprite {
-    objectType = 'sprite' as const;
+    objectType = "sprite" as const;
     size: Helpers.Dimensions = { width: 22, height: 50 };
+    socket: SocketIOClient.Socket;
 
     descriptor: ServerInterfaces.FuelingStationDescriptor;
     zIndex: number;
-    state: State = { canBeActivated: false };
+    state: State = {
+        canBeActivated: false,
+        dialogOpen: false,
+        fullyFueled: false
+    };
 
     constructor(socket: SocketIOClient.Socket, descriptor: ServerInterfaces.FuelingStationDescriptor, zIndex: number) {
+        this.socket = socket;
         this.descriptor = descriptor;
         this.zIndex = zIndex;
     }
@@ -38,7 +47,7 @@ export class FuelingStation implements Scene.Sprite {
                 this.size.width + 10,
                 this.size.height + 10
             );
-            context.strokeStyle = 'red';
+            context.strokeStyle = "red";
             context.lineWidth = 2;
             context.stroke();
         }
@@ -66,9 +75,24 @@ export class FuelingStation implements Scene.Sprite {
         );
 
         this.state.canBeActivated = stationContainsPlayerCorner || playerContainsStationCorner;
+
+        // Potentially open dialog
+        if (scene.state.keyboard.space && this.state.canBeActivated && !this.state.dialogOpen) {
+            this.state.dialogOpen = true;
+            scene.addSprite(
+                new FuelDialog({
+                    socket: this.socket,
+                    initialPercentFull: this.state.fullyFueled ? 100 : 0,
+                    zIndex: 100,
+                    onClose: () => this.state.dialogOpen = false,
+                    onFullyFueled: () => this.state.fullyFueled = true
+                })
+            );
+        }
+
     }
 
     private static _getImage() {
-        return (document.getElementById('fuel_pump') as HTMLImageElement);
+        return (document.getElementById("fuel_pump") as HTMLImageElement);
     }
 }

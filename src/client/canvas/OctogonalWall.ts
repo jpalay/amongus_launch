@@ -1,8 +1,8 @@
-import * as Helpers from './helpers';
-import * as Scene from './Scene'
+import * as Helpers from "./helpers";
+import * as Scene from "./Scene"
 
 export class OctogonalWall implements Scene.StaticObject {
-    objectType = 'static' as const;
+    objectType = "static" as const;
     octogonWidth: number;
     offset: { offsetX: number, offsetY: number };
 
@@ -19,7 +19,7 @@ export class OctogonalWall implements Scene.StaticObject {
     };
 
     blocksPoint(testPoint: Helpers.Coordinate) {
-        const testCanvas = document.createElement('canvas');
+        const testCanvas = document.createElement("canvas");
         const context = Helpers.getContext(testCanvas);
         this._renderWithContext(context);
         return context.isPointInStroke(testPoint.x, testPoint.y);
@@ -82,7 +82,7 @@ export class OctogonalWall implements Scene.StaticObject {
 
         context.closePath()
         context.lineWidth = 6;
-        context.strokeStyle = 'blue';
+        context.strokeStyle = "blue";
         context.stroke();
     }
 }

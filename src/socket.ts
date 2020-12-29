@@ -1,11 +1,11 @@
 // tslint:disable:no-console
-import { Server, Socket } from 'socket.io';
-import { v4 as uuidv4 } from 'uuid';
-import lowdb from 'lowdb'
-import FileSync from 'lowdb/adapters/FileSync'
+import { Server, Socket } from "socket.io";
+import { v4 as uuidv4 } from "uuid";
+import lowdb from "lowdb"
+import FileSync from "lowdb/adapters/FileSync"
 
-import { Room, PlayerDescriptor, FuelingStationDescriptor } from './ServerInterfaces';
-import * as ServerInterfaces from './ServerInterfaces';
+import { Room, PlayerDescriptor, FuelingStationDescriptor } from "./ServerInterfaces";
+import * as ServerInterfaces from "./ServerInterfaces";
 
 
 type Schema = {
@@ -14,7 +14,7 @@ type Schema = {
     fuelingStations: ServerInterfaces.FuelingStationDescriptor[],
 }
 
-const adapter = new FileSync<Schema>('db.json');
+const adapter = new FileSync<Schema>("db.json");
 const db = lowdb(adapter);
 
 const MAX_ROOM_SIZE = 13;
@@ -39,23 +39,23 @@ const FUELING_STATION_LOCATIONS = [
 db.defaults({ players: [], rooms: [], fuelingStations: [] }).write()
 
 export default (io: Server) => {
-    io.on('connection', socket => {
-        socket.on('event', (message: ServerInterfaces.RequestParams) => {
+    io.on("connection", socket => {
+        socket.on("event", (message: ServerInterfaces.RequestParams) => {
             const params = message as ServerInterfaces.RequestParams;
-            console.log('============== received params ==============')
+            console.log("============== received params ==============")
             console.log(params)
-            console.log('============== done receiving params ==============')
+            console.log("============== done receiving params ==============")
 
             switch (params.eventName) {
-                case 'register_user':
+                case "register_user":
                     _registerUser(params, socket, io);
                     break;
 
-                case 'start_game':
+                case "start_game":
                     _startGame(params, socket, io);
                     break;
 
-                case 'update_state':
+                case "update_state":
                     _updateState(params, socket, io)
             }
         });
@@ -89,17 +89,17 @@ const _registerUser = (params: ServerInterfaces.RegisterUserParams, socket: Sock
     );
 
     db.read();
-    const allPlayers = db.get('players').filter({ roomName: room.name }).value().map(playerDescriptor => ({
+    const allPlayers = db.get("players").filter({ roomName: room.name }).value().map(playerDescriptor => ({
         descriptor: playerDescriptor,
-        fuelingStation: db.get('fuelingStations').find({ playerId: playerDescriptor.id }).value()
+        fuelingStation: db.get("fuelingStations").find({ playerId: playerDescriptor.id }).value()
     }))
 
     const response: ServerInterfaces.RegisterUserResponse = {
-        eventName: 'register_user',
+        eventName: "register_user",
         room,
         registeredPlayer: {
             descriptor: currentPlayerDescriptor,
-            fuelingStation: db.get('fuelingStations').find({ playerId: currentPlayerDescriptor.id }).value()
+            fuelingStation: db.get("fuelingStations").find({ playerId: currentPlayerDescriptor.id }).value()
         },
         allPlayers,
         gamePhase: room.gamePhase
@@ -111,12 +111,12 @@ const _registerUser = (params: ServerInterfaces.RegisterUserParams, socket: Sock
 
 const _startGame = (params: ServerInterfaces.StartGameParams, socket: Socket, io: Server) => {
     db.read();
-    db.get('rooms').find({ name: params.roomName }).assign({ gamePhase: 'run_game' }).write();
-    const room = db.get('rooms').find({ name: params.roomName }).value();
+    db.get("rooms").find({ name: params.roomName }).assign({ gamePhase: "run_game" }).write();
+    const room = db.get("rooms").find({ name: params.roomName }).value();
 
     const response: ServerInterfaces.StartGameResponse = {
-        eventName: 'start_game',
-        allPlayers: db.get('players').filter({ roomName: room.name }).value()
+        eventName: "start_game",
+        allPlayers: db.get("players").filter({ roomName: room.name }).value()
     }
 
     _broadcastMessage(io, room.name, response);
@@ -125,9 +125,9 @@ const _startGame = (params: ServerInterfaces.StartGameParams, socket: Socket, io
 
 const _updateState = (params: ServerInterfaces.UpdateStateParams, socket: Socket, io: Server) => {
     db.read();
-    const { roomName } = db.get('players').find({id: params.playerId}).value();
+    const { roomName } = db.get("players").find({id: params.playerId}).value();
     const response: ServerInterfaces.UpdateStateResponse = {
-        eventName: 'update_state',
+        eventName: "update_state",
         playerId: params.playerId,
         updateQueue: params.updateQueue,
     }
@@ -139,20 +139,20 @@ const _updateState = (params: ServerInterfaces.UpdateStateParams, socket: Socket
  ***********************/
 
 const _broadcastMessage = (io: Server, roomName: string, response: ServerInterfaces.ServerResponse) => {
-    console.log('============== sending response ==============')
+    console.log("============== sending response ==============")
     console.log(response)
-    io.in(roomName).emit('event', response);
-    console.log('============== done sending response ==============')
+    io.in(roomName).emit("event", response);
+    console.log("============== done sending response ==============")
 }
 
 const _getOrCreateRoom = (roomName: string) => {
-    const existingRoom = db.get('rooms').find({name: roomName }).value();
+    const existingRoom = db.get("rooms").find({name: roomName }).value();
 
     if (existingRoom !== undefined) {
         return { room: existingRoom, existingRoom: true };
     } else {
-        const room = { name: roomName, gamePhase: 'lobby' as const };
-        db.get('rooms').push(room).write();
+        const room = { name: roomName, gamePhase: "lobby" as const };
+        db.get("rooms").push(room).write();
         return { room, existingRoom: false};
     }
 }
@@ -162,17 +162,17 @@ const _getOrCreatePlayer = (
     name: string,
     descriptor: PlayerDescriptor
 ) => {
-    const existingPlayer = db.get('players').find({roomName, name}).value();
+    const existingPlayer = db.get("players").find({roomName, name}).value();
     if (existingPlayer !== undefined) {
         return existingPlayer;
     } else {
-        const currentRoomSize = db.get('players').filter({ roomName }).value().length;
+        const currentRoomSize = db.get("players").filter({ roomName }).value().length;
         if (currentRoomSize > MAX_ROOM_SIZE) {
-            throw new Error('too many players in the room')
+            throw new Error("too many players in the room")
         }
 
-        db.get('players').push(descriptor).write();
-        db.get('fuelingStations').push({
+        db.get("players").push(descriptor).write();
+        db.get("fuelingStations").push({
             roomName,
             playerId: descriptor.id,
             position: FUELING_STATION_LOCATIONS[currentRoomSize],
