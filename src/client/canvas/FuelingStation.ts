@@ -85,11 +85,21 @@ export class FuelingStation implements Scene.Sprite {
                     initialPercentFull: this.state.fullyFueled ? 100 : 0,
                     zIndex: 100,
                     onClose: () => this.state.dialogOpen = false,
-                    onFullyFueled: () => this.state.fullyFueled = true
+                    onFullyFueled: () => this._onFullyFueled()
                 })
             );
         }
 
+    }
+
+    private _onFullyFueled = () => {
+        this.state.fullyFueled = true;
+        const message: ServerInterfaces.FuelingCompleteParams = {
+            eventName: "fueling_complete",
+            roomName: this.descriptor.roomName,
+            playerId: this.descriptor.playerId
+        }
+        this.socket.emit("event", message);
     }
 
     private static _getImage() {

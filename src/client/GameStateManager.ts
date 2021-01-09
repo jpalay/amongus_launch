@@ -2,7 +2,7 @@ import m from "mithril";
 
 import * as ServerInterfaces from "../ServerInterfaces";
 import * as Scene from "./canvas/Scene"
-import * as Player from "./canvas/Player"
+import * as LaunchSequence from "./canvas/LaunchSequence"
 import * as OctogonalWall from "./canvas/OctogonalWall"
 
 export type State = {
@@ -43,8 +43,7 @@ export class GameStateManager {
                     800,
                     ServerInterfaces.CANVAS_SIZE
                 )
-            ],
-            onAddPlayer: (gamePhase) => { this._refreshPlayerList(gamePhase) }
+            ]
         })
 
         this._initializeSockets()
@@ -54,7 +53,15 @@ export class GameStateManager {
         this.socket.on("event", (message: ServerInterfaces.ServerResponse) => {
             switch (message.eventName) {
                 case "start_game":
-                    this._handleStartGameResponse(message)
+                    this._startGame();
+                    break;
+
+                case "register_user":
+                    this._addNewPlayers(message);
+                    break;
+
+                case "ready_to_launch":
+                    this._initiateLaunchSequence();
                     break;
             }
         });
@@ -104,7 +111,7 @@ export class GameStateManager {
 
     private _renderLobby() {
         const startGameButton = this.scene.currentPlayer()?.descriptor.isAdmin
-            ? m("button", { onclick: () => this._startGame() }, "start game")
+            ? m("button", { onclick: () => this._emitStartGame() }, "start game")
             : null;
 
         return m("div", [
@@ -143,7 +150,7 @@ export class GameStateManager {
         this.socket.emit("event", message);
     }
 
-    private _startGame() {
+    private _emitStartGame() {
         this.socket.emit("event", {
             eventName: "start_game",
             roomName: this.state.roomName
@@ -154,31 +161,27 @@ export class GameStateManager {
      * SOCKET CALLBACKS
      ***************************/
 
-    _handleStartGameResponse(message: ServerInterfaces.StartGameResponse) {
+    _startGame() {
         if (this.state.gamePhase === "lobby") {
             this.state.gamePhase = "run_game";
             m.redraw()
         }
     }
 
+    _addNewPlayers(message: ServerInterfaces.RegisterUserResponse) {
+        this.scene.addNewPlayers(
+            message.allPlayers.map(playerAndStation => playerAndStation.descriptor),
+            message.allPlayers.map(playerAndStation => playerAndStation.fuelingStation)
+        );
 
-    /****************************
-     * OTHER CALLBACKS & HELPERS
-     ***************************/
+        this.state.playerNames = message.allPlayers.map(playerAndStation => playerAndStation.descriptor.name);
 
-    private _refreshPlayerList(gamePhase: ServerInterfaces.GamePhase) {
-        this.state.playerNames = this.scene.sprites
-            .filter(sprite => sprite instanceof Player.Player)
-            // filter uses a typeguard, so this is safe
-            .map(player => (<Player.Player>player).descriptor.name);
+        // in case we're joining in the middle of a game
+        this.state.gamePhase = message.gamePhase;
+        m.redraw();
+    }
 
-        if (this.state.gamePhase === "join_game_pending") {
-            this.state.gamePhase = gamePhase;
-            m.redraw();
-        }
-        
-        if (this.state.gamePhase === "lobby") {
-            m.redraw();
-        }
+    _initiateLaunchSequence() {
+        this.scene.addSprite(new LaunchSequence.LaunchSequence(1000));
     }
 }

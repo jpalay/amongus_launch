@@ -57,6 +57,11 @@ export default (io: Server) => {
 
                 case "update_state":
                     _updateState(params, socket, io)
+                    break;
+
+                case "fueling_complete":
+                    _fuelingComplete(params, socket, io)
+                    break;
             }
         });
     });
@@ -134,6 +139,26 @@ const _updateState = (params: ServerInterfaces.UpdateStateParams, socket: Socket
     _broadcastMessage(io, roomName, response);
 }
 
+const _fuelingComplete = (params: ServerInterfaces.FuelingCompleteParams, socket: Socket, io: Server) => {
+    db
+        .get("fuelingStations")
+        .find({ playerId: params.playerId })
+        .assign({ isFueled: true })
+        .write();
+
+    db.read();
+    const fuelingComplete = db.get("fuelingStations")
+        .find({ roomName: params.roomName, isFueled: false })
+        .size()
+        .value() === 0;
+
+    if (fuelingComplete) {
+        _broadcastMessage(io, params.roomName, {
+            eventName: "ready_to_launch"
+        });
+    }
+}
+
 /***********************
  * HELPERS
  ***********************/
@@ -176,6 +201,7 @@ const _getOrCreatePlayer = (
             roomName,
             playerId: descriptor.id,
             position: FUELING_STATION_LOCATIONS[currentRoomSize],
+            isFueled: false
         }).write();
         console.log("wrote to fuelingStations");
 

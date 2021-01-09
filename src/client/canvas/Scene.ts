@@ -19,7 +19,6 @@ export interface StaticObject extends WorldObject {
 export interface Sprite extends WorldObject {
     objectType: "sprite"
     updateState(scene: Scene): void;
-    render(canvas: HTMLCanvasElement): void;
 }
 
 export type State = {
@@ -41,22 +40,18 @@ export class Scene {
     sprites: Sprite[];
     state: State;
     currentPlayerName: string | null;
-    onAddPlayer: (gamePhase: ServerInterfaces.GamePhase) => void;
 
     constructor({
         socket,
         staticObjects,
-        onAddPlayer,
     }: {
         socket: SocketIOClient.Socket,
         staticObjects: StaticObject[],
-        onAddPlayer: (gamePhase: ServerInterfaces.GamePhase) => void
     }) {
         this.socket = socket;
         this.sprites = [];
         this.staticObjects = staticObjects;
         this.currentPlayerName = null;
-        this.onAddPlayer = onAddPlayer;
         this.state = {
             ticks: 0,
             keyboard: {
@@ -70,35 +65,28 @@ export class Scene {
             }
         };
 
-        this.socket.on("event", (message: ServerInterfaces.ServerResponse) => {
-            if (message.eventName === "register_user") {
-                this._addNewPlayers(message);
-            }
-        });
     }
 
-    private _addNewPlayers = (message: ServerInterfaces.RegisterUserResponse) => {
-        const newPlayersAndStations = message.allPlayers.filter(
-            playerAndStation => this.sprites.findIndex(
-                sprite => (sprite instanceof Player) && sprite.descriptor.name === playerAndStation.descriptor.name
+     addNewPlayers = (allPlayers: ServerInterfaces.PlayerDescriptor[], fuelingStations: ServerInterfaces.FuelingStationDescriptor[]) => {
+        const newPlayerDescriptors = allPlayers.filter(
+            playerDescriptor => this.sprites.findIndex(
+                sprite => (sprite instanceof Player) && sprite.descriptor.name === playerDescriptor.name
             ) === -1
         );
 
-        const newPlayers = newPlayersAndStations.map(playerAndStation =>
-            this.currentPlayerName !== null && this.currentPlayerName === playerAndStation.descriptor.name
-                ? new CurrentPlayer(this.socket, playerAndStation.descriptor, 2)
-                : new OtherPlayer(this.socket, playerAndStation.descriptor, 1)
+        const newPlayers = newPlayerDescriptors.map(playerDescriptor =>
+            this.currentPlayerName !== null && this.currentPlayerName === playerDescriptor.name
+                ? new CurrentPlayer(this.socket, playerDescriptor, 2)
+                : new OtherPlayer(this.socket, playerDescriptor, 1)
         );
 
-        const newFuelingStations = newPlayersAndStations.map(playerAndStation =>
-            new FuelingStation(this.socket, playerAndStation.fuelingStation, 0)
+        const newFuelingStations = fuelingStations.filter(fuelingStationDescriptor =>
+            newPlayerDescriptors.some(playerDescriptor => playerDescriptor.id === fuelingStationDescriptor.playerId)
+        ).map(fuelingStationDescriptor =>
+            new FuelingStation(this.socket, fuelingStationDescriptor, 0)
         );
 
         this.sprites = this.sprites.concat(newPlayers).concat(newFuelingStations);
-
-        if (newPlayersAndStations.length > 0) {
-            this.onAddPlayer(message.room.gamePhase);
-        }
     }
 
     private _renderScene(canvas: HTMLCanvasElement) {

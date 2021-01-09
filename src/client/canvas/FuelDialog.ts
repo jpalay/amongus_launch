@@ -68,7 +68,7 @@ export class FuelDialog implements Scene.Sprite {
         }
 
 
-        if (!this.state.fuelButtonPressed && scene.state.keyboard.f) {
+        if (this.state.percentFull < 100 && !this.state.fuelButtonPressed && scene.state.keyboard.f) {
             this.state.percentFull = Math.min(100, this.state.percentFull + 5);
             if (this.state.percentFull === 100) {
                 this.onFullyFueled();

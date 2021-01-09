@@ -21,6 +21,7 @@ export type FuelingStationDescriptor = {
     roomName: string;
     playerId: string;
     position: Helpers.Coordinate;
+    isFueled: boolean;
 }
 
 export type RegisterUserParams = {
@@ -41,6 +42,12 @@ export type UpdateStateParams = {
     updateQueue: Player.State[],
 };
 
+export type FuelingCompleteParams = {
+    eventName: "fueling_complete";
+    roomName: string;
+    playerId: string;
+}
+
 export type RegisterUserResponse = {
     eventName: "register_user";
     room: Room,
@@ -59,7 +66,12 @@ export type StartGameResponse = {
     eventName: "start_game";
     allPlayers: PlayerDescriptor[];
 }
+
+export type ReadyToLaunchResponse = {
+    eventName: "ready_to_launch"
+}
+
 export type UpdateStateResponse = UpdateStateParams;
 
-export type RequestParams = RegisterUserParams | StartGameParams | UpdateStateParams;
-export type ServerResponse = RegisterUserResponse | StartGameResponse | UpdateStateResponse;
+export type RequestParams = RegisterUserParams | StartGameParams | UpdateStateParams | FuelingCompleteParams;
+export type ServerResponse = RegisterUserResponse | StartGameResponse | UpdateStateResponse | ReadyToLaunchResponse;
