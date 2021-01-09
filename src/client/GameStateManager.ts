@@ -9,6 +9,7 @@ export type State = {
     gamePhase: ServerInterfaces.GamePhase;
     userName: string,
     roomName: string,
+    selectedColor: ServerInterfaces.Color;
     playerNames: string[];
 }
 
@@ -25,6 +26,7 @@ export class GameStateManager {
         gamePhase: "join_game",
         userName: "",
         roomName: "",
+        selectedColor: "teal",
         playerNames: []
     };
 
@@ -87,22 +89,32 @@ export class GameStateManager {
     }
 
     private _renderForm() {
-        return m("div", [
-            m("input", {
+        return m("div.GameForm", [
+            m("input.TextInput", {
                 type: "text",
                 placeholder: "username",
                 oninput: (e: InputEvent) => { this.state.userName = (<HTMLInputElement>e.target)!.value }
             }),
-            m("input", {
+            m("input.TextInput", {
                 type: "text",
                 placeholder: "room name",
                 oninput: (e: InputEvent) => { this.state.roomName = (<HTMLInputElement>e.target)!.value }
             }),
-            m("button", {
+            m(
+                "div.ColorSelector",
+                ServerInterfaces.Colors.map(this._renderColorBlock)
+            ),
+            m("button.JoinGameButton", {
                 onclick: () => this._registerUser()
-            }, "join game")
+            }, "join game"),
+        ])
+    }
 
-        ]);
+    private _renderColorBlock = (color: ServerInterfaces.Color) => {
+        const children: string[] = this.state.selectedColor === color ? ["x"] : [];
+        return m(`div.ColorBlock.ColorBlock--${color}`, {
+            onclick: () => { this.state.selectedColor = color; }
+        }, children);
     }
 
     private _renderJoinGamePending() {
@@ -114,14 +126,30 @@ export class GameStateManager {
             ? m("button", { onclick: () => this._emitStartGame() }, "start game")
             : null;
 
-        return m("div", [
-            m("ul", this.state.playerNames.map(playerName => m("li", playerName))),
-            startGameButton
+        return m("div.Lobby", [
+            m("h3", "Team members:"),
+            m("ul", this.state.playerNames.map(playerName => m("li.PlayerName", playerName))),
+            this._renderInstructions(),
+            startGameButton,
         ])
     }
 
+    private _renderInstructions() {
+        return m("div.Instructions", {style: "text-align: center"}, [
+            m("h3", "Instructions:"),
+            m("ul", [
+                m("li.Instruction", "1. Click and hold to move"),
+                m("li.Instruction", "2. Find your task, and press space to interact"),
+                m("li.Instruction", "3. When all tasks are complete, Nested Portfolios will launch!")
+            ])
+        ]);
+    }
+
     private _renderGame() {
-        return m("canvas#GameCanvas", ServerInterfaces.CANVAS_SIZE);
+        return m("div", [
+            m("canvas#GameCanvas", ServerInterfaces.CANVAS_SIZE),
+            this._renderInstructions()
+        ]);
     }
 
     onupdate() {
@@ -138,12 +166,13 @@ export class GameStateManager {
     private _registerUser() {
         const userName = this.state.userName;
         const roomName = this.state.roomName;
+        const color = this.state.selectedColor;
         this.scene.currentPlayerName = userName;
 
         const message: ServerInterfaces.RegisterUserParams = {
             eventName: "register_user",
             roomName,
-            color: "red",
+            color,
             userName,
         };
         this.state.gamePhase = "join_game_pending";

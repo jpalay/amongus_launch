@@ -26,7 +26,7 @@ export class Player implements Scene.Sprite {
 
     private _getImage() {
         const imageNumber = Math.floor(this.state.walkingTicks / 5) % 4;
-        return (document.getElementById(`red${imageNumber}`) as HTMLImageElement);
+        return (document.getElementById(`${this.descriptor.color}${imageNumber}`) as HTMLImageElement);
     }
 
     center(): Helpers.Coordinate {

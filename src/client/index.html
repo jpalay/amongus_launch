@@ -2,10 +2,88 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Gamedev Canvas Workshop</title>
+    <title>Final Launch Tasks</title>
     <style>
-    	* { padding: 0; margin: 0; }
     	canvas { background: #eee; display: block; margin: 0 auto; }
+
+        body {
+            font-family: sans-serif;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin: 0;
+            padding: 0;
+        }
+
+        .Lobby {
+            text-align: center;
+        }
+
+        .Instructions {
+            text-align: center;
+        }
+
+        .GameForm {
+            width: max-content;
+            margin: 5px auto;
+            text-align: center;
+        }
+
+        .TextInput {
+            display: block;
+            margin: 5px auto;
+        }
+
+        .ColorSelector {
+            margin: 5px auto;
+            width: 124px;
+            text-align: center;
+        }
+
+        .ColorBlock {
+            width: 35px;
+            height: 30px;
+            line-height: 30px;
+            display: inline-block;
+            margin: 3px;
+            vertical-align: top;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .ColorBlock--teal {
+            background-color: #4BFDC9;
+        }
+
+        .ColorBlock--red {
+            background-color: #BD424C;
+        }
+
+        .ColorBlock--blue {
+            background-color: #3951D4;
+        }
+
+        .ColorBlock--purple {
+            background-color: #7A58BE;
+        }
+
+        .ColorBlock--brown {
+            background-color: #7F6B51;
+        }
+
+        .ColorBlock--black {
+            background-color: #5F6773;
+        }
+
+        .ColorBlock--pink {
+            background-color: #E756B3;
+        }
     </style>
 </head>
 <body>
@@ -16,8 +94,45 @@
     <img src="../../assets/red/red3.png" id="red3" style="display: none">
     <img src="../../assets/red/red4.png" id="red4" style="display: none">
 
+    <img src="../../assets/teal/teal0.png" id="teal0" style="display: none">
+    <img src="../../assets/teal/teal1.png" id="teal1" style="display: none">
+    <img src="../../assets/teal/teal2.png" id="teal2" style="display: none">
+    <img src="../../assets/teal/teal3.png" id="teal3" style="display: none">
+    <img src="../../assets/teal/teal4.png" id="teal4" style="display: none">
+
+    <img src="../../assets/blue/blue0.png" id="blue0" style="display: none">
+    <img src="../../assets/blue/blue1.png" id="blue1" style="display: none">
+    <img src="../../assets/blue/blue2.png" id="blue2" style="display: none">
+    <img src="../../assets/blue/blue3.png" id="blue3" style="display: none">
+    <img src="../../assets/blue/blue4.png" id="blue4" style="display: none">
+
+    <img src="../../assets/purple/purple0.png" id="purple0" style="display: none">
+    <img src="../../assets/purple/purple1.png" id="purple1" style="display: none">
+    <img src="../../assets/purple/purple2.png" id="purple2" style="display: none">
+    <img src="../../assets/purple/purple3.png" id="purple3" style="display: none">
+    <img src="../../assets/purple/purple4.png" id="purple4" style="display: none">
+
+    <img src="../../assets/brown/brown0.png" id="brown0" style="display: none">
+    <img src="../../assets/brown/brown1.png" id="brown1" style="display: none">
+    <img src="../../assets/brown/brown2.png" id="brown2" style="display: none">
+    <img src="../../assets/brown/brown3.png" id="brown3" style="display: none">
+    <img src="../../assets/brown/brown4.png" id="brown4" style="display: none">
+
+    <img src="../../assets/black/black0.png" id="black0" style="display: none">
+    <img src="../../assets/black/black1.png" id="black1" style="display: none">
+    <img src="../../assets/black/black2.png" id="black2" style="display: none">
+    <img src="../../assets/black/black3.png" id="black3" style="display: none">
+    <img src="../../assets/black/black4.png" id="black4" style="display: none">
+
+    <img src="../../assets/pink/pink0.png" id="pink0" style="display: none">
+    <img src="../../assets/pink/pink1.png" id="pink1" style="display: none">
+    <img src="../../assets/pink/pink2.png" id="pink2" style="display: none">
+    <img src="../../assets/pink/pink3.png" id="pink3" style="display: none">
+    <img src="../../assets/pink/pink4.png" id="pink4" style="display: none">
+
     <img src="../../assets/fuel_pump.png" id="fuel_pump" style="display: none">
     <img src="../../assets/upthumb.png" id="upthumb" style="display: none">
+    <img src="../../assets/megaparty.png" id="megaparty" style="display: none">
     <div id="main"></div>
     <script src="./index.ts"></script>
 
