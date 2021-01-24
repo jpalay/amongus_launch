@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "%%%% PRESSING ENTER %%%%%";
+
 # Test if is Root
 if [[ $(id -u) -ne 0 ]] ; then echo "Please run as root" ; exit 1 ; fi
 
