@@ -17,7 +17,7 @@ type Schema = {
 const adapter = new FileSync<Schema>("db.json");
 const db = lowdb(adapter);
 
-const MAX_ROOM_SIZE = 13;
+const MAX_ROOM_SIZE = 14;
 const FUELING_STATION_LOCATIONS = [
     { x: 300, y: 200 },
     { x: 300, y: 300 },
@@ -34,6 +34,7 @@ const FUELING_STATION_LOCATIONS = [
     { x: 500, y: 300 },
     { x: 500, y: 400 },
     { x: 500, y: 500 },
+    { x: 600, y: 400 },
 ];
 
 db.defaults({ players: [], rooms: [], fuelingStations: [] }).write()

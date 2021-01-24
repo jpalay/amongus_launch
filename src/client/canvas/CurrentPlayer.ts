@@ -12,7 +12,7 @@ export class CurrentPlayer extends Player.Player {
         this.maxSpeed = 5;
         this.updateQueue = [];
 
-        setInterval(this._sendUpdateQueue, 100);
+        setInterval(this._sendUpdateQueue, 300);
     }
 
     updateState(scene: Scene.Scene) {
