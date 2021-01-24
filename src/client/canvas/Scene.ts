@@ -139,24 +139,28 @@ export class Scene {
         // add keyboard listeners
         document.addEventListener("keydown", event => {
             if (event.key === " ") {
+                event.preventDefault();
                 this.state.keyboard.space = true;
             }
         });
 
         document.addEventListener("keyup", event => {
             if (event.key === " ") {
+                event.preventDefault();
                 this.state.keyboard.space = false;
             }
         });
 
         document.addEventListener("keydown", event => {
             if (event.key === "f") {
+                event.preventDefault();
                 this.state.keyboard.f = true;
             }
         });
 
         document.addEventListener("keyup", event => {
             if (event.key === "f") {
+                event.preventDefault();
                 this.state.keyboard.f = false;
             }
         });
