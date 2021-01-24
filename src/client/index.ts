@@ -5,7 +5,7 @@ import * as GameStateManager from "./GameStateManager"
 
 const main = () => {
     const socket: SocketIOClient.Socket = io(
-        `ws://${document.location.hostname}:3000`,
+        "https://palay-pi-websockets.ngrok.io",
         {
             transports: ["websocket"]
         }
