@@ -7,17 +7,17 @@ export type State = { ttl: number; megaparty: boolean, megapartyTicks: 0 }
 export class LaunchSequence implements Scene.Sprite {
     objectType = "sprite" as const;
 
-    state: State = {
-        // xcxc
-        ttl: 1,
-        megaparty: false,
-        megapartyTicks: 0
-    };
     zIndex: number;
     beginVictoryTransitionTicks: number = 150;
+    state: State;
 
-    constructor(zIndex: number) {
+    constructor(zIndex: number, debugMode: boolean) {
         this.zIndex = zIndex;
+        this.state = {
+            ttl: debugMode ? 2 : 15,
+            megaparty: false,
+            megapartyTicks: 0
+        };
         const interval = window.setInterval(
             () => {
                 if (this.state.ttl > 0) {

@@ -40,18 +40,23 @@ export class Scene {
     sprites: Sprite[];
     state: State;
     currentPlayerName: string | null;
+    debugMode: boolean;
 
     constructor({
         socket,
         staticObjects,
+        debugMode,
     }: {
         socket: SocketIOClient.Socket,
         staticObjects: StaticObject[],
+        debugMode: boolean,
     }) {
         this.socket = socket;
         this.sprites = [];
         this.staticObjects = staticObjects;
         this.currentPlayerName = null;
+        this.debugMode = debugMode;
+
         this.state = {
             ticks: 0,
             keyboard: {

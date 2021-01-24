@@ -85,7 +85,8 @@ export class FuelingStation implements Scene.Sprite {
                     initialPercentFull: this.state.fullyFueled ? 100 : 0,
                     zIndex: 100,
                     onClose: () => this.state.dialogOpen = false,
-                    onFullyFueled: () => this._onFullyFueled()
+                    onFullyFueled: () => this._onFullyFueled(),
+                    debugMode: scene.debugMode,
                 })
             );
         }

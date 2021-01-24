@@ -15,6 +15,7 @@ export class FuelDialog implements Scene.Sprite {
     zIndex: number;
     onClose: () => void;
     onFullyFueled: () => void;
+    debugMode: boolean;
 
     state: State = {
         percentFull: 0,
@@ -23,17 +24,19 @@ export class FuelDialog implements Scene.Sprite {
     };
 
     constructor({
-        socket, initialPercentFull, zIndex, onClose, onFullyFueled
+        socket, initialPercentFull, zIndex, onClose, onFullyFueled, debugMode
         }: {
         socket: SocketIOClient.Socket,
         initialPercentFull: number,
         zIndex: number,
         onClose: () => void,
-        onFullyFueled: () => void
+        onFullyFueled: () => void,
+        debugMode: boolean
     }) {
         this.zIndex = zIndex;
         this.onClose = onClose;
         this.onFullyFueled = onFullyFueled;
+        this.debugMode = debugMode;
         this.state.percentFull = initialPercentFull;
     }
 
@@ -69,8 +72,8 @@ export class FuelDialog implements Scene.Sprite {
 
 
         if (this.state.percentFull < 100 && !this.state.fuelButtonPressed && scene.state.keyboard.f) {
-            // xcxc
-            this.state.percentFull = Math.min(100, this.state.percentFull + 100);
+            const additionalFuel = this.debugMode ? 100 : 5;
+            this.state.percentFull = Math.min(100, this.state.percentFull + additionalFuel);
             if (this.state.percentFull === 100) {
                 this.onFullyFueled();
             }

@@ -8,7 +8,6 @@ import * as OctogonalWall from "./canvas/OctogonalWall"
 export type State = {
     gamePhase: ServerInterfaces.GamePhase;
     userName: string,
-    roomName: string,
     selectedColor: ServerInterfaces.Color;
     playerNames: string[];
 }
@@ -25,7 +24,6 @@ export class GameStateManager {
     state: State = {
         gamePhase: "join_game",
         userName: "",
-        roomName: "",
         selectedColor: "teal",
         playerNames: []
     };
@@ -45,7 +43,8 @@ export class GameStateManager {
                     800,
                     ServerInterfaces.CANVAS_SIZE
                 )
-            ]
+            ],
+            debugMode: this._debugMode(),
         })
 
         this._initializeSockets()
@@ -95,18 +94,13 @@ export class GameStateManager {
                 placeholder: "username",
                 oninput: (e: InputEvent) => { this.state.userName = (<HTMLInputElement>e.target)!.value }
             }),
-            m("input.TextInput", {
-                type: "text",
-                placeholder: "room name",
-                oninput: (e: InputEvent) => { this.state.roomName = (<HTMLInputElement>e.target)!.value }
-            }),
             m(
                 "div.ColorSelector",
                 ServerInterfaces.Colors.map(this._renderColorBlock)
             ),
             m("button.JoinGameButton", {
                 onclick: () => this._registerUser()
-            }, "join game"),
+            }, "get started"),
         ])
     }
 
@@ -159,19 +153,23 @@ export class GameStateManager {
         }
     }
 
+    private _debugMode() {
+        return new URLSearchParams(window.location.search)
+            .get("debugMode") !== null;
+    }
+
     /****************************
      * EVENT HANDLERS
      ***************************/
 
     private _registerUser() {
         const userName = this.state.userName;
-        const roomName = this.state.roomName;
         const color = this.state.selectedColor;
         this.scene.currentPlayerName = userName;
 
         const message: ServerInterfaces.RegisterUserParams = {
             eventName: "register_user",
-            roomName,
+            roomName: this._roomName(),
             color,
             userName,
         };
@@ -182,8 +180,13 @@ export class GameStateManager {
     private _emitStartGame() {
         this.socket.emit("event", {
             eventName: "start_game",
-            roomName: this.state.roomName
+            roomName: this._roomName()
         })
+    }
+
+    private _roomName() {
+        const roomName = new URLSearchParams(window.location.search).get("groupName");
+        return roomName === null ? "LAUNCH" : roomName;
     }
 
     /****************************
@@ -211,6 +214,6 @@ export class GameStateManager {
     }
 
     _initiateLaunchSequence() {
-        this.scene.addSprite(new LaunchSequence.LaunchSequence(1000));
+        this.scene.addSprite(new LaunchSequence.LaunchSequence(1000, this._debugMode()));
     }
 }
