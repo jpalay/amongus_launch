@@ -159,7 +159,7 @@ const _fuelingComplete = (params: ServerInterfaces.FuelingCompleteParams, socket
             eventName: "ready_to_launch"
         });
         setTimeout(() => {
-            exec('../enter_key.sh')
+            exec('/home/pi/amongus_launch/enter_key.sh')
         }, 15000)
     }
 }
