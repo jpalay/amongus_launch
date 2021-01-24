@@ -91,7 +91,9 @@ export class GameStateManager {
 
     private _renderForm(buttonDisabled: boolean) {
         return m("div.GameForm", [
-            m("input.TextInput", {
+            // complains bc class is defined in selector as well as class attribute,
+            // but mithril does support this
+            m("input.TextInput" as any, {
                 type: "text",
                 placeholder: "username",
                 class: this.state.invalidUserName ? "TextInput--error" : null,

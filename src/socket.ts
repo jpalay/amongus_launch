@@ -3,6 +3,7 @@ import { Server, Socket } from "socket.io";
 import { v4 as uuidv4 } from "uuid";
 import lowdb from "lowdb"
 import FileSync from "lowdb/adapters/FileSync"
+import { exec } from "child_process"
 
 import { Room, PlayerDescriptor, FuelingStationDescriptor } from "./ServerInterfaces";
 import * as ServerInterfaces from "./ServerInterfaces";
@@ -157,6 +158,9 @@ const _fuelingComplete = (params: ServerInterfaces.FuelingCompleteParams, socket
         _broadcastMessage(io, params.roomName, {
             eventName: "ready_to_launch"
         });
+        setTimeout(() => {
+            exec('../enter_key.sh')
+        }, 15000)
     }
 }
 
