@@ -96,7 +96,7 @@ export class LaunchSequence implements Scene.Sprite {
         context.beginPath();
         context.font = "120px sans-serif";
         context.textAlign = "center";
-        context.fillStyle = "blue";
+        context.fillStyle = "#333333";
 
         context.fillText(`Launching in ${this.state.ttl}`, textPosition.x, textPosition.y)
 

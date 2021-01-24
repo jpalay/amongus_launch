@@ -81,7 +81,7 @@ export class OctogonalWall implements Scene.StaticObject {
         }
 
         context.closePath()
-        context.lineWidth = 6;
+        context.lineWidth = 5;
         context.strokeStyle = "blue";
         context.stroke();
     }

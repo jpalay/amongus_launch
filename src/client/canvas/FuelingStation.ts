@@ -47,7 +47,7 @@ export class FuelingStation implements Scene.Sprite {
                 this.size.width + 10,
                 this.size.height + 10
             );
-            context.strokeStyle = "red";
+            context.strokeStyle = "#CC0000";
             context.lineWidth = 2;
             context.stroke();
         }

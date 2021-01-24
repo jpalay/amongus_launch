@@ -7,6 +7,7 @@ import * as OctogonalWall from "./canvas/OctogonalWall"
 
 export type State = {
     gamePhase: ServerInterfaces.GamePhase;
+    invalidUserName: boolean;
     userName: string,
     selectedColor: ServerInterfaces.Color;
     playerNames: string[];
@@ -23,6 +24,7 @@ export class GameStateManager {
 
     state: State = {
         gamePhase: "join_game",
+        invalidUserName: false,
         userName: "",
         selectedColor: "teal",
         playerNames: []
@@ -75,9 +77,9 @@ export class GameStateManager {
     view() {
         switch (this.state.gamePhase) {
             case "join_game":
-                return this._renderForm();
+                return this._renderForm(false);
             case "join_game_pending":
-                return this._renderJoinGamePending();
+                return this._renderForm(true);
             case "lobby":
                 return this._renderLobby();
             case "run_game":
@@ -87,11 +89,12 @@ export class GameStateManager {
         }
     }
 
-    private _renderForm() {
+    private _renderForm(buttonDisabled: boolean) {
         return m("div.GameForm", [
             m("input.TextInput", {
                 type: "text",
                 placeholder: "username",
+                class: this.state.invalidUserName ? "TextInput--error" : null,
                 oninput: (e: InputEvent) => { this.state.userName = (<HTMLInputElement>e.target)!.value }
             }),
             m(
@@ -99,8 +102,9 @@ export class GameStateManager {
                 ServerInterfaces.Colors.map(this._renderColorBlock)
             ),
             m("button.JoinGameButton", {
-                onclick: () => this._registerUser()
-            }, "get started"),
+                onclick: () => this._registerUser(),
+                disabled: buttonDisabled,
+            }, buttonDisabled ? "waiting for server" : "get started"),
         ])
     }
 
@@ -164,6 +168,12 @@ export class GameStateManager {
 
     private _registerUser() {
         const userName = this.state.userName;
+        if (userName === "") {
+            this.state.invalidUserName = true;
+            return;
+        } else {
+            this.state.invalidUserName = false;
+        }
         const color = this.state.selectedColor;
         this.scene.currentPlayerName = userName;
 

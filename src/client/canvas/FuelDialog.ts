@@ -161,7 +161,7 @@ export class FuelDialog implements Scene.Sprite {
             this.fuelMeterSize.width,
             fuelHeight
         );
-        context.fillStyle = "green"
+        context.fillStyle = "#007E33"
         context.fill();
     }
 
