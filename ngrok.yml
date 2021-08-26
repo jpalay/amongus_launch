@@ -1,0 +1,10 @@
+authtoken: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+tunnels:
+  nodeserver:
+    addr: 4000
+    proto: http
+    subdomain: palay-pi
+  websockets:
+    addr: 3000
+    proto: http
+    subdomain: palay-pi-websockets
